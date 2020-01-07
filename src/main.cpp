@@ -1,4 +1,3 @@
-#define IOTWEBCONF_DEBUG_TO_SERIAL true
 #include <Arduino.h>
 #include <IotWebConf.h>
 #include <Preferences.h>
@@ -34,7 +33,7 @@ void setup() {
   ////////////////////////////////////////////////
   preferences.begin("CP",false);
   unsigned int counter = preferences.getUInt("counter", 0);
-  if((int)rtc_get_reset_reason(0) == 1){
+  if((int)rtc_get_reset_reason(0) == 1){//power based reset
     counter++;
     if(counter > 3){
       counter = 0;
