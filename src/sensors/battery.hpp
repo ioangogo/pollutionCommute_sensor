@@ -3,5 +3,5 @@
 class BatterySensor : Sensor
 {
     public:
-    bool BatterySensor::CollectData(CayenneLPP *msg);
+    bool CollectData(CayenneLPP *msg);
 };

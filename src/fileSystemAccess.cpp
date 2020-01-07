@@ -22,7 +22,7 @@ bool writeMessage(CayenneLPP message){
         return false;
     }else{
         File messageFile = SPIFFS.open("/msgs/{time}.msg", FILE_WRITE);
-        messageFile.write(message.getBuffer(), message.getSize);
+        messageFile.write(message.getBuffer(), message.getSize());
         messageFile.close();
     }
 }
