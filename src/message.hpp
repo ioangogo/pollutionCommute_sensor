@@ -2,11 +2,10 @@
 
 typedef struct
 {
-    int pm25;
-    int lat;
-    int lng;
-    uint64_t gpsunix;
-    bool dataPacket;
+    int pm25 = NULL;
+    int lat = NULL;
+    int lng = NULL;
+    uint64_t gpsunix = NULL;
 } sensorData;
 
 #define PACKET_SIZE sizeof(sensorData)

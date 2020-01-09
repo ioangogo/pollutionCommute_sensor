@@ -2,6 +2,9 @@
 #include <hal/hal.h>
 #include <SPI.h>
 #include "message.hpp"
+#include "globals.hpp"
+
+osjob_t sendJob;
 
 // Code from example code of the arduino-LMIC libary examples
 // Find original source here: https://github.com/mcci-catena/arduino-lmic/blob/master/examples/ttn-otaa/ttn-otaa.ino
@@ -86,8 +89,6 @@ void onEvent (ev_t ev) {
               Serial.print(LMIC.dataLen);
               Serial.println(F(" bytes of payload"));
             }
-            // Schedule next transmission
-            // os_setTimedCallback(&sendjob, os_getTime()+sec2osticks(TX_INTERVAL), do_send);
             break;
         case EV_LOST_TSYNC:
             Serial.println(F("EV_LOST_TSYNC"));
@@ -124,22 +125,39 @@ void onEvent (ev_t ev) {
 }
 // End of code from external source
 
-// We will send a empty packet to inicate OTAA
-void initSend(osjob_t *j){
-    packet initPacket;
-    initPacket.sensor.dataPacket = false;//Signal to the decoder that we should ignore this packet
-    if(LMIC.opmode & OP_TXRXPEND){
-        Serial.println(F("Packet currently sending, not sending packet"));
-    }else{
-        LMIC_setTxData2(1, loraPacket.packetBytes, PACKET_SIZE, 0);
+void LoraSend(void * param){
+    if(send){
+        if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+            // copy message buffer for packet
+            byte buf[PACKET_SIZE];
+            memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
+
+            // prepare to transmit buffer
+            LMIC_setDrTxpow(DR_SF11, 1);
+            LMIC_setTxData2(1, buf, PACKET_SIZE, 0);
+
+            // reset packet
+            LoraPacket.sensor.gpsunix = 0;
+            LoraPacket.sensor.pm25 = 0;
+            LoraPacket.sensor.lat = 0;
+            LoraPacket.sensor.lng = 0;
+
+            // reset send state and allow other processes to use packet
+            send = false;
+            xSemaphoreGive(packetSemaphore);
+        }
     }
 }
 
-void LoraSend(osjob_t *j, packet loraPacket, int pkgSize){
-    loraPacket.sensor.dataPacket = true; // Identify this packet as one containing sensor data
-    if(LMIC.opmode & OP_TXRXPEND){
-        Serial.println(F("Packet currently sending, not sending packet"));
-    }else{
-        LMIC_setTxData2(1, loraPacket.packetBytes, PACKET_SIZE, 0);
+void ttnHandling(void * param){
+    os_init();
+    LMIC_reset();
+    LMIC_setDrTxpow(DR_SF7, 1);
+    LMIC_startJoining();
+
+    for(;;){
+        os_runloop_once();
+        vTaskDelay(1);//Give other tasks a chance to run on the processor
     }
+    
 }

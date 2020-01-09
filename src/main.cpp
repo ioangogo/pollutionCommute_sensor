@@ -1,9 +1,19 @@
+// Redefining serial 1 pins so that hardware serial can be used
+#define TX1 13
+#define TX1 12
+
 #include <Arduino.h>
 #include <IotWebConf.h>
 #include <Preferences.h>
 #include "transmission.hpp"
+#include "message.hpp"
 #include "powerManagement.hpp"
 #include <rom/rtc.h>
+#include "globals.hpp"
+// Global varible for the tasks, will be semaphore protected
+packet loraPacket;
+SemaphoreHandle_t packetSemaphore;
+bool send = false;
 
 #define MIN_TO_MS 60000
 
@@ -12,13 +22,13 @@ const char wifiPassword[] = "commutePollution";
 
 Preferences preferences;
 
+//Config stuff
 DNSServer dnsServer;
 WebServer server(80);
 IotWebConf iotConf(deviceName, &dnsServer, &server, wifiPassword);
 #define BOOL_LEN 3
 char sds11EN[BOOL_LEN];
 boolean setupMode = false;
-
 IotWebConfParameter sdsParam = IotWebConfParameter("enable SDS011 Sensor", "sds", sds11EN, BOOL_LEN, "number", NULL, "0", "max='1' min='0'");
 
 void handleRoot();
@@ -28,7 +38,9 @@ void setup() {
   Serial.begin(9600);
   Serial.println();
   Serial.println("Starting up...");
+
   esp_deep_sleep(10*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
+
   //////////////////////////////////////////////////
   // Reset counter to get device into setup mode //
   ////////////////////////////////////////////////
@@ -66,7 +78,12 @@ void setup() {
     server.on("/", handleRoot);
     server.on("/config", []{ iotConf.handleConfig(); });
     server.onNotFound([](){ iotConf.handleNotFound(); });
+  }else
+  {
+    packetSemaphore = xSemaphoreCreateMutex();
+    xTaskCreatePinnedToCore();
   }
+  
 }
 
 void loop() {
