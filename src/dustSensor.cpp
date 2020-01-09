@@ -1,6 +1,6 @@
 // Redefining serial 1 pins so that hardware serial can be used
 #define TX1 13
-#define TX1 12
+#define RX1 12
 
 #include <Arduino.h>
 #include <SDS011.h>
