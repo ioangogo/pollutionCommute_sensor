@@ -2,9 +2,10 @@
 #include <IotWebConf.h>
 #include <Preferences.h>
 #include "transmission.hpp"
+#include "powerManagement.hpp"
 #include <rom/rtc.h>
 
-
+#define MIN_TO_MS 60000
 
 const char deviceName[] = "commutePollution";
 const char wifiPassword[] = "commutePollution";
@@ -27,23 +28,33 @@ void setup() {
   Serial.begin(9600);
   Serial.println();
   Serial.println("Starting up...");
-
+  esp_deep_sleep(10*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
   //////////////////////////////////////////////////
   // Reset counter to get device into setup mode //
   ////////////////////////////////////////////////
+  
+  //Load Counter from flash storage 
   preferences.begin("CP",false);
   unsigned int counter = preferences.getUInt("counter", 0);
-  if((int)rtc_get_reset_reason(0) == 1){//power based reset
+
+  // Detect if the reset reason was power based, we dont want deep sleep triggering this
+  if((int)rtc_get_reset_reason(0) == 1){
     counter++;
     if(counter > 3){
       counter = 0;
       Serial.println("3 Restarts, going into transmit mode");
     }
   }
+  // if the button has been pressed twice 
   if(counter > 2){
-      setupMode=true;
-      Serial.println("2 Restarts, going into setup mode");
+    setupMode=true;
+    Serial.println("2 Restarts, going into setup mode");
+  }else{
+    // Reset reset counter if we are not in setup mode and the reset was not power based
+    if((int)rtc_get_reset_reason(0) != 1){
+      counter = 0;
     }
+  }
   preferences.putUInt("counter", counter);
   // put your setup code here, to run once:
 
@@ -63,6 +74,7 @@ void loop() {
     iotConf.doLoop();
   }else{
     doTransimission();
+    startTimerDeepSleep();
   }
   // put your main code here, to run repeatedly:
 }
