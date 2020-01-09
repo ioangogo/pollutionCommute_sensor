@@ -1,11 +1,14 @@
 #include <Arduino.h>
 
+#ifndef MESSAGE_H
+#define MESSAGE_H
+
 typedef struct
 {
-    int pm25 = NULL;
-    int lat = NULL;
-    int lng = NULL;
-    uint64_t gpsunix = NULL;
+    int pm25;
+    int lat;
+    int lng;
+    uint64_t gpsunix;
 } sensorData;
 
 #define PACKET_SIZE sizeof(sensorData)
@@ -13,10 +16,11 @@ typedef struct
 #define long_SIZE sizeof(uint64_t)
 
 typedef union{
-    sensorData sensor;
+    sensorData sensorContent;
     byte packetBytes[PACKET_SIZE];
-} packet;
+} Sensorpacket;
+#endif
 
-String PacketToJson(packet pkt);
+String PacketToJson(Sensorpacket pkt);
 
 void checkSendTask( void *Param);

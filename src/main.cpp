@@ -1,6 +1,6 @@
 // Redefining serial 1 pins so that hardware serial can be used
 #define TX1 13
-#define TX1 12
+#define RX1 12
 
 #include <Arduino.h>
 #include <IotWebConf.h>
@@ -12,11 +12,10 @@
 #include <SDS011.h>
 #include "globals.hpp"
 // Global varible for the tasks, will be semaphore protected
-packet loraPacket;
+Sensorpacket loraPacket;
 SemaphoreHandle_t packetSemaphore;
 bool send = false; // Flag to tell the lora task to send
 bool sent = false; // flag to tell the system to deep sleep
-SDS011 my_sds;
 
 #define MIN_TO_MS 60000
 

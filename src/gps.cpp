@@ -26,7 +26,7 @@ void gpsTask( void *Param){
             uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
             uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensor.gpsunix = unixtimestamp;
+                LoraPacket.sensorContent.gpsunix = unixtimestamp;
                 xSemaphoreGive(packetSemaphore);
             }
 
@@ -36,8 +36,8 @@ void gpsTask( void *Param){
             int lat = round(fix.latitude()*1000);
             int lng = round(fix.longitude()*1000);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensor.lat = lat;
-                LoraPacket.sensor.lat = lng;
+                LoraPacket.sensorContent.lat = lat;
+                LoraPacket.sensorContent.lat = lng;
                 xSemaphoreGive(packetSemaphore);
             }
 

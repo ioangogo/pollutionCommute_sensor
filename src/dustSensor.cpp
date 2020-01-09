@@ -22,7 +22,7 @@ void sdsTask( void *Param){
         err = my_sds.read(&pm10, &pm25);
         if(!err){
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensor.pm25 = round(pm25*10);
+                LoraPacket.sensorContent.pm25 = round(pm25*10);
                 my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
                 xSemaphoreGive(packetSemaphore);
                 

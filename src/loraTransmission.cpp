@@ -138,10 +138,10 @@ void LoraSend(void * param){
                 LMIC_setTxData2(1, buf, PACKET_SIZE, 0);
 
                 // reset packet
-                LoraPacket.sensor.gpsunix = 0;
-                LoraPacket.sensor.pm25 = 0;
-                LoraPacket.sensor.lat = 0;
-                LoraPacket.sensor.lng = 0;
+                LoraPacket.sensorContent.gpsunix = 0;
+                LoraPacket.sensorContent.pm25 = 0;
+                LoraPacket.sensorContent.lat = 0;
+                LoraPacket.sensorContent.lng = 0;
 
                 // reset send state and allow other processes to use packet
                 send = false;

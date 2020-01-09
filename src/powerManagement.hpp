@@ -1,1 +1,1 @@
-void startTimerDeepSleep()
+void startTimerDeepSleep();
