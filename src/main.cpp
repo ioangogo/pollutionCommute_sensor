@@ -14,6 +14,7 @@
 packet loraPacket;
 SemaphoreHandle_t packetSemaphore;
 bool send = false;
+bool sent = false;
 
 #define MIN_TO_MS 60000
 
@@ -81,7 +82,6 @@ void setup() {
   }else
   {
     packetSemaphore = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore();
   }
   
 }
@@ -91,7 +91,9 @@ void loop() {
     iotConf.doLoop();
   }else{
     doTransimission();
-    startTimerDeepSleep();
+    if(sent){
+      startTimerDeepSleep();
+    }
   }
   // put your main code here, to run repeatedly:
 }
