@@ -16,31 +16,52 @@ uint64_t Y2KtoUnix(uint32_t timestamp){
 }
 
 void gpsTask( void *Param){
-    gpsPort.begin(9600, SERIAL_8N1, RXD2, TXD2);
+    //gpsPort.begin(9600, SERIAL_8N1, RXD2, TXD2);
+    bool locGot = false;
+    bool timeGot = false;
 
     for(;;){
-        while(gps.available(gpsPort)){
-            fix = gps.read();
-        }
-        if(fix.valid.time){
-            uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
-            uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
+
+        if(!timeGot){
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensorContent.gpsunix = unixtimestamp;
+                LoraPacket.sensorContent.gpsunix = 3454363674;
+                timeGot = true;
                 xSemaphoreGive(packetSemaphore);
             }
 
         }
-        if(fix.valid.location){
+        if(!locGot){
+            // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
+            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+                LoraPacket.sensorContent.lat = 33.03*1000;
+                LoraPacket.sensorContent.lng = 33.03*1000;
+                locGot = true;
+                xSemaphoreGive(packetSemaphore);
+            }
+        /*while(gps.available(gpsPort)){
+            fix = gps.read();
+        }
+        if(fix.valid.time && !timeGot){
+            uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
+            uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
+            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+                LoraPacket.sensorContent.gpsunix = unixtimestamp;
+                timeGot = true;
+                xSemaphoreGive(packetSemaphore);
+            }
+
+        }
+        if(fix.valid.location && !locGot){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
             int lat = round(fix.latitude()*1000);
             int lng = round(fix.longitude()*1000);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 LoraPacket.sensorContent.lat = lat;
                 LoraPacket.sensorContent.lat = lng;
+                locGot = true;
                 xSemaphoreGive(packetSemaphore);
-            }
-
+            }*/
+        
 
 
         }

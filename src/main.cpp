@@ -5,19 +5,20 @@
 #include <Arduino.h>
 #include <IotWebConf.h>
 #include <Preferences.h>
-#include "transmission.hpp"
-#include "message.hpp"
-#include "powerManagement.hpp"
 #include <rom/rtc.h>
-#include <SDS011.h>
 #include "globals.hpp"
+#include "message.hpp"
+#include "transmission.hpp"
+#include "loraTransmission.hpp"
+#include "powerManagement.hpp"
+#include "dustSensor.hpp"
+#include "gps.hpp"
 // Global varible for the tasks, will be semaphore protected
-Sensorpacket loraPacket;
+Sensorpacket LoraPacket;
 SemaphoreHandle_t packetSemaphore;
 bool send = false; // Flag to tell the lora task to send
-bool sent = false; // flag to tell the system to deep sleep
-
-#define MIN_TO_MS 60000
+bool sent = false; 
+bool sleepFlag = false;// flag to tell the system to deep sleep
 
 const char deviceName[] = "commutePollution";
 const char wifiPassword[] = "commutePollution";
@@ -40,8 +41,6 @@ void setup() {
   Serial.begin(9600);
   Serial.println();
   Serial.println("Starting up...");
-
-  esp_deep_sleep(10*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
 
   //////////////////////////////////////////////////
   // Reset counter to get device into setup mode //
@@ -70,7 +69,7 @@ void setup() {
     }
   }
   preferences.putUInt("counter", counter); // save the counter
-
+  delay(1000);//Allow the user to reset befor doing anything
 
   if(setupMode){
     iotConf.addParameter(&sdsParam);
@@ -81,7 +80,16 @@ void setup() {
     server.onNotFound([](){ iotConf.handleNotFound(); });
   }else
   {
+    LoraPacket.sensorContent.gpsunix = 0;
+    LoraPacket.sensorContent.pm25 = -1;
+    LoraPacket.sensorContent.lat = GPS_NULL;
+    LoraPacket.sensorContent.lng = GPS_NULL;
     packetSemaphore = xSemaphoreCreateMutex();
+    //xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 1);
+    xTaskCreatePinnedToCore(gpsTask, "gpsTask", 2048, NULL, 3, NULL, 1);
+    xTaskCreatePinnedToCore(sdsTask, "sdsTask", 2048, NULL, 5, NULL, 1);
   }
   
 }
@@ -91,9 +99,10 @@ void loop() {
     iotConf.doLoop();
   }else{
     doTransimission();
-    if(sent){
+    if(sleepFlag){
       startTimerDeepSleep();
     }
+    vTaskDelay(1);
   }
   // put your main code here, to run repeatedly:
 }

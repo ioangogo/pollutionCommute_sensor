@@ -15,15 +15,19 @@ HardwareSerial port(1);
 void sdsTask( void *Param){
     float pm10, pm25;
     int err;
-    my_sds.begin(&port);
-    my_sds.wakeup();//the device is probably sleeping, wake it up so it can begin mesurements
+    bool cap = false;
+    //my_sds.begin(&port);
+    //my_sds.wakeup();//the device is probably sleeping, wake it up so it can begin mesurements
 
     for(;;){
-        err = my_sds.read(&pm10, &pm25);
-        if(!err){
+        //err = my_sds.read(&pm10, &pm25);
+        err = 0;
+        if(!err && !cap){
+            pm25 = 22.2;
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 LoraPacket.sensorContent.pm25 = round(pm25*10);
-                my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
+                //my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
+                cap = true;
                 xSemaphoreGive(packetSemaphore);
                 
             }
