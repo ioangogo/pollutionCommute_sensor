@@ -126,26 +126,32 @@ void onEvent (ev_t ev) {
 // End of code from external source
 
 void LoraSend(void * param){
-    if(send){
-        if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-            // copy message buffer for packet
-            byte buf[PACKET_SIZE];
-            memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
+    for(;;){
+        if(send){
+            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+                // copy message buffer for packet
+                byte buf[PACKET_SIZE];
+                memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
 
-            // prepare to transmit buffer
-            LMIC_setDrTxpow(DR_SF11, 1);
-            LMIC_setTxData2(1, buf, PACKET_SIZE, 0);
+                // prepare to transmit buffer
+                LMIC_setDrTxpow(DR_SF11, 1);
+                LMIC_setTxData2(1, buf, PACKET_SIZE, 0);
 
-            // reset packet
-            LoraPacket.sensor.gpsunix = 0;
-            LoraPacket.sensor.pm25 = 0;
-            LoraPacket.sensor.lat = 0;
-            LoraPacket.sensor.lng = 0;
+                // reset packet
+                LoraPacket.sensor.gpsunix = 0;
+                LoraPacket.sensor.pm25 = 0;
+                LoraPacket.sensor.lat = 0;
+                LoraPacket.sensor.lng = 0;
 
-            // reset send state and allow other processes to use packet
-            send = false;
-            xSemaphoreGive(packetSemaphore);
+                // reset send state and allow other processes to use packet
+                send = false;
+                
+                // Signal to the main loop that we want to go to sleep now
+                sent = true;
+                xSemaphoreGive(packetSemaphore);
+            }
         }
+    vTaskDelay(1);//Give other tasks a chance to run on the processor
     }
 }
 

@@ -9,12 +9,14 @@
 #include "message.hpp"
 #include "powerManagement.hpp"
 #include <rom/rtc.h>
+#include <SDS011.h>
 #include "globals.hpp"
 // Global varible for the tasks, will be semaphore protected
 packet loraPacket;
 SemaphoreHandle_t packetSemaphore;
-bool send = false;
-bool sent = false;
+bool send = false; // Flag to tell the lora task to send
+bool sent = false; // flag to tell the system to deep sleep
+SDS011 my_sds;
 
 #define MIN_TO_MS 60000
 
@@ -68,8 +70,7 @@ void setup() {
       counter = 0;
     }
   }
-  preferences.putUInt("counter", counter);
-  // put your setup code here, to run once:
+  preferences.putUInt("counter", counter); // save the counter
 
 
   if(setupMode){

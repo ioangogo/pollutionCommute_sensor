@@ -33,8 +33,8 @@ void gpsTask( void *Param){
         }
         if(fix.valid.location){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
-            int lat = round(fix.latitude*1000);
-            int lng = round(fix.longitude*1000);
+            int lat = round(fix.latitude()*1000);
+            int lng = round(fix.longitude()*1000);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 LoraPacket.sensor.lat = lat;
                 LoraPacket.sensor.lat = lng;
