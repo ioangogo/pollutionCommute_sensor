@@ -7,3 +7,5 @@ extern Sensorpacket LoraPacket;
 extern SemaphoreHandle_t packetSemaphore;
 extern bool send;
 extern bool sent; // This is to send the device into deep sleep when needed
+
+extern Preferences preferences;
