@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Preferences.h>
 #include "message.hpp"
 
 #define Y2K_OFFSET 946684800;
