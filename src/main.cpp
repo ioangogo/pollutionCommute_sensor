@@ -87,9 +87,9 @@ void setup() {
     packetSemaphore = xSemaphoreCreateMutex();
     //xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 5, NULL, 1);
     xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(gpsTask, "gpsTask", 2048, NULL, 3, NULL, 1);
-    xTaskCreatePinnedToCore(sdsTask, "sdsTask", 2048, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
+    xTaskCreatePinnedToCore(gpsTask, "gpsTask", 2048, NULL, 3, NULL, 0);
+    xTaskCreatePinnedToCore(sdsTask, "sdsTask", 2048, NULL, 5, NULL, 0);
   }
   
 }

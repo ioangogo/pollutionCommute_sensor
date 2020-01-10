@@ -1,0 +1,13 @@
+{
+	"folders": [
+		{
+			"name": "LoraPolution",
+			"path": "."
+		},
+		{
+			"name": "loraTest",
+			"path": "/home/ijl/Documents/PlatformIO/Projects/loraTest"
+		}
+	],
+	"settings": {}
+}
