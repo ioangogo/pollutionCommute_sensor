@@ -23,8 +23,6 @@ bool sleepFlag = false;// flag to tell the system to deep sleep
 const char deviceName[] = "commutePollution";
 const char wifiPassword[] = "commutePollution";
 
-Preferences preferences;
-
 //Config stuff
 DNSServer dnsServer;
 WebServer server(80);
