@@ -12,5 +12,6 @@ extern SemaphoreHandle_t packetSemaphore;
 extern bool send;
 extern bool sleepFlag; // This is to send the device into deep sleep when needed
 extern bool sent; // This is to send the device into deep sleep when needed
+extern bool ttnConnected;
 
 extern Preferences preferences;

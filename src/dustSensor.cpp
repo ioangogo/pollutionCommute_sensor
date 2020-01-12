@@ -16,16 +16,24 @@ void sdsTask( void *Param){
     float pm10, pm25;
     int err;
     bool cap = false;
+    #ifndef SENSORLESS
     my_sds.begin(&port);
     my_sds.wakeup();//the device is probably sleeping, wake it up so it can begin mesurements
-
+    #endif
     for(;;){
+        #ifndef SENSORLESS
         err = my_sds.read(&pm10, &pm25);
-        err = 0;
+        #else
+        err=1;
+        pm10 = 33.33;
+        pm25 = 33.33;
+        #endif
         if(!err && !cap){
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 LoraPacket.sensorContent.pm25 = round(pm25*10);
+                #ifndef SENSORLESS
                 my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
+                #endif
                 cap = true;
                 xSemaphoreGive(packetSemaphore);
                 
