@@ -63,19 +63,19 @@ void gpsTask( void *Param){
     for(;;){
         if(!timeGot){
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensorContent.gpsunix = 723837297332;
+                LoraPacket.sensorContent.gpsunix = 1578843311;
                 timeGot = true;
                 xSemaphoreGive(packetSemaphore);
             }
 
         }
-        if(fix.valid.location && !locGot){
+        if(!locGot){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
-            int lat = esp_random()%90;
-            int lng = esp_random()%180;
+            int lat = random(90);
+            int lng = random(180);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 LoraPacket.sensorContent.lat = lat;
-                LoraPacket.sensorContent.lat = lng;
+                LoraPacket.sensorContent.lng = lng;
                 locGot = true;
                 xSemaphoreGive(packetSemaphore);
             }

@@ -16,8 +16,8 @@
 // Global varible for the tasks, will be semaphore protected
 Sensorpacket LoraPacket;
 SemaphoreHandle_t packetSemaphore;
-bool send = false; // Flag to tell the lora task to send
-bool sent = false; 
+bool sendFlag = false; // Flag to tell the lora task to send
+bool sentFlag = false; 
 bool sleepFlag = false;// flag to tell the system to deep sleep
 bool ttnConnected = false; // decide what we should do with the mesurements
 
@@ -42,6 +42,9 @@ void setup() {
   Serial.begin(9600);
   Serial.println();
   Serial.println("Starting up...");
+  #ifdef SENSORLESS
+  Serial.println("Sensorless test mode");
+  #endif
 
   //////////////////////////////////////////////////
   // Reset counter to get device into setup mode //
@@ -86,7 +89,7 @@ void setup() {
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
     packetSemaphore = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 5, NULL, 1);
+    xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
     xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
     xTaskCreatePinnedToCore(gpsTask, "gpsTask", 2048, NULL, 3, NULL, 0);
@@ -103,7 +106,7 @@ void loop() {
     if(sleepFlag){
       startTimerDeepSleep();
     }
-    vTaskDelay(1); //allow other threads to run
+    vTaskDelay(2000/portTICK_PERIOD_MS); //allow other threads to run
   }
   // put your main code here, to run repeatedly:
 }

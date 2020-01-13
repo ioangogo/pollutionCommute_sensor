@@ -8,7 +8,7 @@ typedef struct
     int pm25;
     int lat;
     int lng;
-    uint64_t gpsunix;
+    int64_t gpsunix;
 } sensorData;
 
 #define PACKET_SIZE sizeof(sensorData)

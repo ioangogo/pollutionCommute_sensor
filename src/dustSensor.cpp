@@ -24,7 +24,7 @@ void sdsTask( void *Param){
         #ifndef SENSORLESS
         err = my_sds.read(&pm10, &pm25);
         #else
-        err=1;
+        err=0;
         pm10 = 33.33;
         pm25 = 33.33;
         #endif
