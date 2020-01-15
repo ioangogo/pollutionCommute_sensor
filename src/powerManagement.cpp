@@ -15,6 +15,9 @@ void startTimerDeepSleep()
     //TODO: Unmount filesystem
     //TODO: Trigger Deepsleep of board
     Serial.printf("Sleeping for %d Mins\n", SLEEP_MINS);
+    sendFlag = false;
+    sentFlag = false;
+    
     esp_deep_sleep(1*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
     
 }

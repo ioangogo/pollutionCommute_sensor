@@ -106,7 +106,7 @@ void loop() {
     if(sleepFlag){
       startTimerDeepSleep();
     }
-    vTaskDelay(2000/portTICK_PERIOD_MS); //allow other threads to run
+    vTaskDelay(portTICK_PERIOD_MS/20000); //allow other threads to run
   }
   // put your main code here, to run repeatedly:
 }

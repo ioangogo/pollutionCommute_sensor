@@ -14,14 +14,14 @@ const lmic_pinmap lmic_pins = {
     .nss = 18,
     .prepare_antenna_tx = nullptr,
     .rst = 14,
-    .dio = {26, 35}
+    .dio = {DIO0, DIO1}
 };
 
 OsScheduler OSS;
 RadioSx1276 radio {lmic_pins};
 LmicEu868 LMIC {radio, OSS};
 
-OsJob sendjob{OSS};
+//OsJob sendjob{OSS};
 
 // Code from example code of the arduino-LMIC libary examples
 // Find original source here: https://github.com/mcci-catena/arduino-lmic/blob/master/examples/ttn-otaa/ttn-otaa.ino
@@ -45,6 +45,7 @@ void onEvent (EventType ev) {
             if (LMIC.getTxRxFlags().test(TxRxStatus::ACK)) {
                 PRINT_DEBUG(1, F("Received ack"));
                 if(sentFlag == true){
+                    // reset send state and allow other processes to use packet
                     sentFlag=false;
                     sleepFlag=true;
                 }
@@ -78,15 +79,12 @@ void LoraSend(void * param){
                 LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
 
                 // reset packet
-                LoraPacket.sensorContent.gpsunix = 0;
                 LoraPacket.sensorContent.pm25 = 0;
                 LoraPacket.sensorContent.lat = 0;
                 LoraPacket.sensorContent.lng = 0;
                 
                 // Signal to the main loop that we have sent the message
                 sentFlag = true;
-                // reset send state and allow other processes to use packet
-                sendFlag = false;
 
                 xSemaphoreGive(packetSemaphore);
             }
@@ -96,19 +94,27 @@ void LoraSend(void * param){
 }
 
 void ttnHandling(void * param){
-    SPI.begin();
+    SPI.begin(SCK,MISO,MOSI,lmic_pins.nss);
     os_init();
     LMIC.init();
     LMIC.reset();
     LMIC.setEventCallBack(onEvent);
     SetupLmicKey<appEui, devEui, appKey>::setup(LMIC);
     LMIC.setClockError(MAX_CLOCK_ERROR * 3 / 100);
+    //LMIC.setAntennaPowerAdjustment(-14);
 
     LMIC.startJoining();
 
-    for(;;){
-        OSS.runloopOnce();
-        vTaskDelay(1);//Give other tasks a chance to run on the processor
+    while(true){
+        OsDeltaTime to_wait = OSS.runloopOnce();
+        TickType_t lastWake;
+        lastWake = xTaskGetTickCount();
+        if(to_wait > OsDeltaTime(5)){
+            vTaskDelay(to_wait.to_ms()/portTICK_PERIOD_MS);
+
+        }
+        
+        //Give other tasks a chance to run on the processor
     }
     
 }
