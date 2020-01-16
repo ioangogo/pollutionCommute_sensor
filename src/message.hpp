@@ -7,10 +7,10 @@ typedef struct
 {
     int pm25;
     int lat;
-    int lng
+    int lng;
 } sensorData;
 
-#define PACKET_SIZE sizeof(sensorData)
+#define PACKET_SIZE (int)sizeof(sensorData)
 #define INT_SIZE sizeof(int)
 #define long_SIZE sizeof(uint64_t)
 

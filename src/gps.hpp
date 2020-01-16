@@ -1,1 +1,2 @@
-void gpsTask( void *Param);
+void doGPSTask();
+void initGPS();

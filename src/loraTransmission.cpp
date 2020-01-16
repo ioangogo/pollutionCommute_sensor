@@ -14,7 +14,7 @@ const lmic_pinmap lmic_pins = {
     .nss = 18,
     .prepare_antenna_tx = nullptr,
     .rst = 14,
-    .dio = {DIO0, DIO1}
+    .dio = {26, 35}
 };
 
 OsScheduler OSS;
@@ -79,9 +79,9 @@ void LoraSend(void * param){
                 LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
 
                 // reset packet
-                LoraPacket.sensorContent.pm25 = 0;
-                LoraPacket.sensorContent.lat = 0;
-                LoraPacket.sensorContent.lng = 0;
+                LoraPacket.sensorContent.pm25 = -1;
+                LoraPacket.sensorContent.lat = GPS_NULL;
+                LoraPacket.sensorContent.lng = GPS_NULL;
                 
                 // Signal to the main loop that we have sent the message
                 sentFlag = true;
@@ -94,13 +94,13 @@ void LoraSend(void * param){
 }
 
 void ttnHandling(void * param){
-    SPI.begin(SCK,MISO,MOSI,lmic_pins.nss);
+    SPI.begin(5,19,27,18);
     os_init();
     LMIC.init();
     LMIC.reset();
     LMIC.setEventCallBack(onEvent);
     SetupLmicKey<appEui, devEui, appKey>::setup(LMIC);
-    LMIC.setClockError(MAX_CLOCK_ERROR * 3 / 100);
+    LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
     //LMIC.setAntennaPowerAdjustment(-14);
 
     LMIC.startJoining();
@@ -108,7 +108,6 @@ void ttnHandling(void * param){
     while(true){
         OsDeltaTime to_wait = OSS.runloopOnce();
         TickType_t lastWake;
-        lastWake = xTaskGetTickCount();
         if(to_wait > OsDeltaTime(5)){
             vTaskDelay(to_wait.to_ms()/portTICK_PERIOD_MS);
 

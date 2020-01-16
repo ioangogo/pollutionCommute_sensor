@@ -20,7 +20,7 @@ bool sendFlag = false; // Flag to tell the lora task to send
 bool sentFlag = false; 
 bool sleepFlag = false;// flag to tell the system to deep sleep
 bool ttnConnected = false; // decide what we should do with the mesurements
-
+uint64_t gpslocTimeUnix;
 Preferences preferences;
 
 const char deviceName[] = "commutePollution";
@@ -44,6 +44,7 @@ void setup() {
   Serial.println("Starting up...");
   #ifdef SENSORLESS
   Serial.println("Sensorless test mode");
+  Serial.printf("packet Size: %d\n", PACKET_SIZE);
   #endif
 
   //////////////////////////////////////////////////
@@ -84,7 +85,6 @@ void setup() {
     server.onNotFound([](){ iotConf.handleNotFound(); });
   }else
   {
-    LoraPacket.sensorContent.gpsunix = 0;
     LoraPacket.sensorContent.pm25 = -1;
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
@@ -92,8 +92,6 @@ void setup() {
     xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
     xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
     xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
-    xTaskCreatePinnedToCore(gpsTask, "gpsTask", 2048, NULL, 3, NULL, 0);
-    xTaskCreatePinnedToCore(sdsTask, "sdsTask", 2048, NULL, 5, NULL, 0);
   }
   
 }
@@ -102,7 +100,6 @@ void loop() {
   if(setupMode){
     iotConf.doLoop();
   }else{
-    doTransimission();
     if(sleepFlag){
       startTimerDeepSleep();
     }

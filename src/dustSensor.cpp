@@ -10,37 +10,26 @@
 
 
 SDS011 my_sds;
-HardwareSerial port(1);
+HardwareSerial sds(1);
+bool cap = false;
 
-void sdsTask( void *Param){
+void initSDS(){
+    my_sds.begin(&sds);
+    my_sds.wakeup();
+}
+
+void doSDS(){
     float pm10, pm25;
     int err;
-    bool cap = false;
-    #ifndef SENSORLESS
-    my_sds.begin(&port);
-    my_sds.wakeup();//the device is probably sleeping, wake it up so it can begin mesurements
-    #endif
-    for(;;){
-        #ifndef SENSORLESS
-        err = my_sds.read(&pm10, &pm25);
-        #else
-        err=0;
-        pm10 = 33.33;
-        pm25 = 33.33;
-        #endif
-        if(!err && !cap){
-            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensorContent.pm25 = round(pm25*10);
-                #ifndef SENSORLESS
-                my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
-                #endif
-                cap = true;
-                xSemaphoreGive(packetSemaphore);
-                
-            }
-
+    err = my_sds.read(&pm10, &pm25);
+    if(!err && !cap){
+        if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+            LoraPacket.sensorContent.pm25 = round(pm25*10);
+            #ifndef SENSORLESS
+            my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
+            #endif
+            cap = true;
+            xSemaphoreGive(packetSemaphore);   
         }
-        vTaskDelay(1);//Free the system up to do other tasks
-        
     }
 }

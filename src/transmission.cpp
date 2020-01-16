@@ -6,10 +6,3 @@ Discription: Stores a failed transmit in the SPIFFS filesystem to transmit on th
 Returns: Boll, the are we charging
 */
 void storeFailedTransmit(/*canyelp struct passed here*/);
-
-
-
-void doTransimission(){
-
-
-}

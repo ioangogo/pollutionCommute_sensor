@@ -1,1 +1,2 @@
-void sdsTask( void *Param);
+void doSDS();
+void initSDS();
