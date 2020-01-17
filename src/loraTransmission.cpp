@@ -92,6 +92,8 @@ void LoraSend(void * param){
     vTaskDelay(1000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
     }
 }
+constexpr char const devEui[devEUILen] = "";
+constexpr char const appKey[appKeyLen] = "";
 
 void ttnHandling(void * param){
     SPI.begin(5,19,27,18);
@@ -99,6 +101,8 @@ void ttnHandling(void * param){
     LMIC.init();
     LMIC.reset();
     LMIC.setEventCallBack(onEvent);
+    strcpy((char *)preferences.getString("DEVEUI").c_str(), devEui);
+    strcpy((char *)preferences.getString("APPKEY").c_str(), appKey);
     SetupLmicKey<appEui, devEui, appKey>::setup(LMIC);
     LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
     //LMIC.setAntennaPowerAdjustment(-14);
@@ -108,7 +112,7 @@ void ttnHandling(void * param){
     while(true){
         OsDeltaTime to_wait = OSS.runloopOnce();
         TickType_t lastWake;
-        if(to_wait > OsDeltaTime(5)){
+        if(to_wait > OsDeltaTime(10)){
             vTaskDelay(to_wait.to_ms()/portTICK_PERIOD_MS);
 
         }

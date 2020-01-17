@@ -27,20 +27,21 @@ const char deviceName[] = "commutePollution";
 const char wifiPassword[] = "commutePollution";
 
 //Config stuff
+#define CONFIG_VERSION "NetworkSetUp"
 DNSServer dnsServer;
 WebServer server(80);
-IotWebConf iotConf(deviceName, &dnsServer, &server, wifiPassword);
-#define BOOL_LEN 3
-char sds11EN[BOOL_LEN];
+IotWebConf iotConf(deviceName, &dnsServer, &server, wifiPassword,CONFIG_VERSION);
+char devEUIInput[devEUILen];
+char appKEYInput[appKeyLen];
 boolean setupMode = false;
-IotWebConfParameter sdsParam = IotWebConfParameter("enable SDS011 Sensor", "sds", sds11EN, BOOL_LEN, "number", NULL, "0", "max='1' min='0'");
+IotWebConfParameter devEUIConfig = IotWebConfParameter("appEUI", "sds", devEUIInput, devEUILen, "text", NULL, NULL);
+IotWebConfParameter appkeyConfig = IotWebConfParameter("appKey", "sds", appKEYInput, appKeyLen, "password", NULL, NULL);
 
 void handleRoot();
 void handleConfigSaved();
 
 void setup() {
   Serial.begin(9600);
-  Serial.println();
   Serial.println("Starting up...");
   #ifdef SENSORLESS
   Serial.println("Sensorless test mode");
@@ -54,6 +55,7 @@ void setup() {
   //Load Counter from flash storage 
   preferences.begin("CP",false);
   unsigned int counter = preferences.getUInt("counter", 0);
+  bool configued = preferences.getBool("configured", false);
 
   // Detect if the reset reason was power based, we dont want deep sleep triggering this
   if((int)rtc_get_reset_reason(0) == 1){
@@ -64,8 +66,9 @@ void setup() {
     }
   }
   // if the button has been pressed twice 
-  if(counter > 2){
+  if(counter > 2 || !configued){
     setupMode=true;
+    preferences.putBool("configured",true);
     Serial.println("2 Restarts, going into setup mode");
   }else{
     // Reset reset counter if we are not in setup mode and the reset was not power based
@@ -77,7 +80,8 @@ void setup() {
   delay(1000);//Allow the user to reset befor doing anything
 
   if(setupMode){
-    iotConf.addParameter(&sdsParam);
+    iotConf.addParameter(&devEUIConfig);
+    iotConf.addParameter(&appkeyConfig);
     iotConf.init();
     iotConf.setConfigSavedCallback(&handleConfigSaved);
     server.on("/", handleRoot);
@@ -111,9 +115,8 @@ void loop() {
 // Store the save settings in the prefrences so we dont have to start the config to get them
 void handleConfigSaved(){
   Serial.println("Configuration was updated.");
-  Serial.println(sds11EN);
-  bool sdsEnabled = atoi(sds11EN);
-  preferences.putBool("sdsEn", sdsEnabled);
+  preferences.putString("APPKEY", appKEYInput);
+  preferences.putString("DEVEUI", devEUIInput);
 
 }
 
@@ -125,10 +128,8 @@ void handleRoot(){
     String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
     s += "<title>Commute Polution</title></head><body>";
     s += "<ul>";
-    s += "<li> Enabled Sensors: ";
-    s += sds11EN;
-    s += "<li>String param value: ";
-    s += preferences.getBool("sdsEn");
+    s += "<li> AppEUI: ";
+    s += appEui;
     s += "</ul>";
     s += "Go to <a href='config'>configure page</a> to change values.";
     s += "</body></html>\n";

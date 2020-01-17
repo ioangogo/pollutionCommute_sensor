@@ -7,6 +7,8 @@
 #define GPS_NULL 333.33*1000
 #define uS_TO_S_FACTOR 1000000
 #define MIN_TO_MS 60*uS_TO_S_FACTOR 
+#define devEUILen 17
+#define appKeyLen 33
 
 extern Sensorpacket LoraPacket;
 extern SemaphoreHandle_t packetSemaphore;
