@@ -14,7 +14,7 @@ const lmic_pinmap lmic_pins = {
     .nss = 18,
     .prepare_antenna_tx = nullptr,
     .rst = 14,
-    .dio = {26, 35}
+    .dio = {DIO0, DIO1}
 };
 
 OsScheduler OSS;
@@ -92,8 +92,11 @@ void LoraSend(void * param){
     vTaskDelay(1000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
     }
 }
-constexpr char const devEui[devEUILen] = "";
-constexpr char const appKey[appKeyLen] = "";
+
+
+// Innitalising these with dummy values, we will strcpy over them later
+constexpr char const devEui[devEUILen] = "D0740BC175E5F4BE";
+constexpr char const appKey[appKeyLen] = "391F21F0D4859ED3249FE1C5DDB7C77E";
 
 void ttnHandling(void * param){
     SPI.begin(5,19,27,18);
@@ -101,9 +104,16 @@ void ttnHandling(void * param){
     LMIC.init();
     LMIC.reset();
     LMIC.setEventCallBack(onEvent);
+
+    //Slightly hacky strcpy to get the user configured strings into the consts
     strcpy((char *)preferences.getString("DEVEUI").c_str(), devEui);
     strcpy((char *)preferences.getString("APPKEY").c_str(), appKey);
+    
     SetupLmicKey<appEui, devEui, appKey>::setup(LMIC);
+
+    Serial.printf("DEBUG: eui: %s, Key: %s\n", devEui, appKey);
+
+
     LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
     //LMIC.setAntennaPowerAdjustment(-14);
 
@@ -111,7 +121,8 @@ void ttnHandling(void * param){
 
     while(true){
         OsDeltaTime to_wait = OSS.runloopOnce();
-        TickType_t lastWake;
+        //Due to timings we only want to free up the processor
+        //to other tasks if the time we have to wait is larger than 10 seconds
         if(to_wait > OsDeltaTime(10)){
             vTaskDelay(to_wait.to_ms()/portTICK_PERIOD_MS);
 

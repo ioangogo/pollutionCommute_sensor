@@ -26,12 +26,6 @@ void doGPSTask(){
     while(gps.available(gpsPort)){
         fix = gps.read();
     }
-    unsigned long curmil = millis();
-    if (curmil-lastMilis > 1000){
-        Serial.printf("%d-%d-%d %d:%d:%d\n", fix.dateTime.year, fix.dateTime.month, fix.dateTime.date,
-        fix.dateTime.hours, fix.dateTime.minutes, fix.dateTime.seconds%60);
-        lastMilis = curmil;
-    }
 
     if(fix.valid.time && !timeGot){
         uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;

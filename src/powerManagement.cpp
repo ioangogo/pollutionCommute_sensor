@@ -1,7 +1,7 @@
 #include <Arduino.h>
 #include "globals.hpp"
 
-#define SLEEP_MINS 1
+#define SLEEP_MINS 5
 
 /*
 Function: startTimerDeepSleep

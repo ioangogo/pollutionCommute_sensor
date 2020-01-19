@@ -34,8 +34,8 @@ IotWebConf iotConf(deviceName, &dnsServer, &server, wifiPassword,CONFIG_VERSION)
 char devEUIInput[devEUILen];
 char appKEYInput[appKeyLen];
 boolean setupMode = false;
-IotWebConfParameter devEUIConfig = IotWebConfParameter("appEUI", "sds", devEUIInput, devEUILen, "text", NULL, NULL);
-IotWebConfParameter appkeyConfig = IotWebConfParameter("appKey", "sds", appKEYInput, appKeyLen, "password", NULL, NULL);
+IotWebConfParameter devEUIConfig = IotWebConfParameter("devEUI", "EUI", devEUIInput, devEUILen, "text", NULL, NULL);
+IotWebConfParameter appkeyConfig = IotWebConfParameter("appKey", "KEY", appKEYInput, appKeyLen, "password", NULL, NULL);
 
 void handleRoot();
 void handleConfigSaved();
@@ -128,8 +128,8 @@ void handleRoot(){
     String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
     s += "<title>Commute Polution</title></head><body>";
     s += "<ul>";
-    s += "<li> AppEUI: ";
-    s += appEui;
+    s += "<li> Appkey: ";
+    s += appKEYInput;
     s += "</ul>";
     s += "Go to <a href='config'>configure page</a> to change values.";
     s += "</body></html>\n";
