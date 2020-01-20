@@ -8,7 +8,6 @@
 #include <rom/rtc.h>
 #include "globals.hpp"
 #include "message.hpp"
-#include "transmission.hpp"
 #include "loraTransmission.hpp"
 #include "powerManagement.hpp"
 #include "dustSensor.hpp"

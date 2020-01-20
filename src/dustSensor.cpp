@@ -24,7 +24,7 @@ void doSDS(){
     float pm10, pm25;
     int err;
     unsigned long timeSinceInit = millis() - startMilis;
-    if(notcap && timeSinceInit == 30000){
+    if(notcap && timeSinceInit >= 30000){
         err = my_sds.read(&pm25, &pm10);
         if(err == 0){
             Serial.printf("%f\r\n", pm25);

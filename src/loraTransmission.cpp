@@ -58,6 +58,8 @@ void onEvent (EventType ev) {
                 }
             }
             break;
+            default:
+                PRINT_DEBUG(1, F("Other Event: "));
     }
 }
 // End of code from external source
@@ -124,8 +126,7 @@ void ttnHandling(void * param){
         //Due to timings we only want to free up the processor
         //to other tasks if the time we have to wait is larger than 10 seconds
         if(to_wait > OsDeltaTime(10)){
-            vTaskDelay(to_wait.to_ms()/portTICK_PERIOD_MS);
-
+            vTaskDelay(10/portTICK_PERIOD_MS);
         }
         
         //Give other tasks a chance to run on the processor

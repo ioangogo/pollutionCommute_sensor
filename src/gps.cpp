@@ -1,6 +1,7 @@
 #include <Arduino.h>
 #include <NMEAGPS.h>
 #include "globals.hpp"
+#include "gps.hpp"
 
 #define GPS_Serial Serial2
 #define gpsPort GPS_Serial
@@ -13,6 +14,13 @@ bool timeGot = false;
 static NMEAGPS gps;
 static gps_fix fix;
 
+void sleepDevice(HardwareSerial &serial){
+    serial.write(SLEEP_CMD);
+}
+void WakeDevice(HardwareSerial &serial){
+    serial.write(WAKE_CMD);
+}
+
 uint64_t Y2KtoUnix(uint32_t timestamp){
     return timestamp + Y2K_OFFSET;
 }
@@ -20,6 +28,8 @@ unsigned long lastMilis = 0;
 
 void initGPS(){
     gpsPort.begin(9600, SERIAL_8N1, RXpin, TXpin);
+    WakeDevice(gpsPort);
+    
 }
 
 void doGPSTask(){
@@ -41,6 +51,7 @@ void doGPSTask(){
             LoraPacket.sensorContent.lat = lat;
             LoraPacket.sensorContent.lat = lng;
             locGot = true;
+            sleepDevice(gpsPort);
             xSemaphoreGive(packetSemaphore);
         }
     }
