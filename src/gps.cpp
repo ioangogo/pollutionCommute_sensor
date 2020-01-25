@@ -38,12 +38,14 @@ void doGPSTask(){
     }
 
     if(fix.valid.time && !timeGot){
+        Serial.println("got Time");
         uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
         uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
         //timeGot = true;
         gpslocTimeUnix = unixtimestamp;
     }
     if(fix.valid.location && !locGot){
+        Serial.println("got location");
         // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
         int lat = lround(fix.latitude()*1000);
         int lng = lround(fix.longitude()*1000);

@@ -40,12 +40,9 @@ void handleRoot();
 void handleConfigSaved();
 
 void setup() {
+  pinMode(LED_BUILTIN, OUTPUT);
   Serial.begin(9600);
   Serial.println("Starting up...");
-  #ifdef SENSORLESS
-  Serial.println("Sensorless test mode");
-  Serial.printf("packet Size: %d\n", PACKET_SIZE);
-  #endif
 
   //////////////////////////////////////////////////
   // Reset counter to get device into setup mode //
@@ -67,7 +64,6 @@ void setup() {
   // if the button has been pressed twice 
   if(counter > 2 || !configued){
     setupMode=true;
-    preferences.putBool("configured",true);
     Serial.println("2 Restarts, going into setup mode");
   }else{
     // Reset reset counter if we are not in setup mode and the reset was not power based
@@ -116,6 +112,7 @@ void handleConfigSaved(){
   Serial.println("Configuration was updated.");
   preferences.putString("APPKEY", appKEYInput);
   preferences.putString("DEVEUI", devEUIInput);
+  preferences.putBool("configured",true);
 
 }
 

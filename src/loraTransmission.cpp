@@ -4,11 +4,11 @@
 
 #include <hal/hal_io.h>
 #include <hal/print_debug.h>
-#include <keyhandler.h>
 #include <lmic.h>
 #include "loraTransmission.hpp"
 #include "message.hpp"
 #include "globals.hpp"
+#include "keyHandling.hpp"
 
 const lmic_pinmap lmic_pins = {
     .nss = 18,
@@ -34,6 +34,7 @@ void printHex2(unsigned v) {
 void onEvent (EventType ev) {
     switch(ev) {
         case EventType::JOINED:
+            digitalWrite(LED_BUILTIN, 1);
             Serial.println(F("EventType::JOINED"));
             ttnConnected = true;
             break;
@@ -87,9 +88,12 @@ void LoraSend(void * param){
                 
                 // Signal to the main loop that we have sent the message
                 sentFlag = true;
+                Serial.println("Sent Packet");
 
                 xSemaphoreGive(packetSemaphore);
             }
+        }else{
+            digitalRead(LED_BUILTIN) ? digitalWrite(LED_BUILTIN, 0): digitalWrite(LED_BUILTIN, 1);
         }
     vTaskDelay(1000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
     }
@@ -97,8 +101,8 @@ void LoraSend(void * param){
 
 
 // Innitalising these with dummy values, we will strcpy over them later
-constexpr char const devEui[devEUILen] = "D0740BC175E5F4BE";
-constexpr char const appKey[appKeyLen] = "391F21F0D4859ED3249FE1C5DDB7C77E";
+char const devEui[devEUILen] = "D0740BC175E5F4BE";
+char const appKey[appKeyLen] = "391F21F0D4859ED3249FE1C5DDB7C77E";
 
 void ttnHandling(void * param){
     SPI.begin(5,19,27,18);
@@ -106,12 +110,9 @@ void ttnHandling(void * param){
     LMIC.init();
     LMIC.reset();
     LMIC.setEventCallBack(onEvent);
-
-    //Slightly hacky strcpy to get the user configured strings into the consts
-    strcpy((char *)preferences.getString("DEVEUI").c_str(), devEui);
-    strcpy((char *)preferences.getString("APPKEY").c_str(), appKey);
-    
-    SetupLmicKey<appEui, devEui, appKey>::setup(LMIC);
+    LMIC.setArtEuiCallback(getappEui);
+    LMIC.setDevKey(getappKey());
+    LMIC.setDevEuiCallback(getdevEui);
 
     Serial.printf("DEBUG: eui: %s, Key: %s\n", devEui, appKey);
 

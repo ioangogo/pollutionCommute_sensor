@@ -29,6 +29,7 @@ void doSDS(){
         if(err == 0){
             Serial.printf("%f\r\n", pm25);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+                Serial.println("got pm2.5");
                 LoraPacket.sensorContent.pm25 = lround(pm25*10);
                 my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
                 notcap = false;
