@@ -12,6 +12,8 @@
 #include "powerManagement.hpp"
 #include "dustSensor.hpp"
 #include "gps.hpp"
+#include "keyHandling.hpp"
+
 // Global varible for the tasks, will be semaphore protected
 Sensorpacket LoraPacket;
 SemaphoreHandle_t packetSemaphore;
@@ -51,7 +53,6 @@ void setup() {
   //Load Counter from flash storage 
   preferences.begin("CP",false);
   unsigned int counter = preferences.getUInt("counter", 0);
-  bool configued = preferences.getBool("configured", false);
 
   // Detect if the reset reason was power based, we dont want deep sleep triggering this
   if((int)rtc_get_reset_reason(0) == 1){
@@ -62,7 +63,7 @@ void setup() {
     }
   }
   // if the button has been pressed twice 
-  if(counter > 2 || !configued){
+  if(counter > 2 || !KeysExistInPref()){
     setupMode=true;
     Serial.println("2 Restarts, going into setup mode");
   }else{
@@ -112,8 +113,6 @@ void handleConfigSaved(){
   Serial.println("Configuration was updated.");
   preferences.putString("APPKEY", appKEYInput);
   preferences.putString("DEVEUI", devEUIInput);
-  preferences.putBool("configured",true);
-
 }
 
 void handleRoot(){

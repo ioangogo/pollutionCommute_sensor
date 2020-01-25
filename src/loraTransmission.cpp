@@ -114,8 +114,6 @@ void ttnHandling(void * param){
     LMIC.setDevKey(getappKey());
     LMIC.setDevEuiCallback(getdevEui);
 
-    Serial.printf("DEBUG: eui: %s, Key: %s\n", devEui, appKey);
-
 
     LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
     //LMIC.setAntennaPowerAdjustment(-14);

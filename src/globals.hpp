@@ -10,8 +10,8 @@
 #define devEUILen 17
 #define appKeyLen 33
 
-#define EUIIntLen 8U
-#define appKeyIntLen 16U
+#define EUIIntLen 8
+#define appKeyIntLen 16
 
 extern Sensorpacket LoraPacket;
 extern SemaphoreHandle_t packetSemaphore;

@@ -19,20 +19,28 @@ uint8_t HexCharsToInt(char const char1, char const char2) {
   return (HexCharToInt(char1) * 0x10) + HexCharToInt(char2);
 }
 
+void debugOutput(uint8_t *buf, int Len){
+    for(int i = 0; i < Len; i++){
+        Serial.printf("%02X ", buf[i]);
+    }
+    Serial.println();
+
+}
+
 void getappEui(uint8_t *buf) {
-    uint8_t appeui[EUIIntLen];
-    int strLen = devEUILen;
+    uint8_t appui[EUIIntLen];
+    int strLen = devEUILen-2;
     for(int i = 0; i < EUIIntLen; i++){
-        appeui[i] = HexCharsToInt(appEui[strLen-1], appEui[strLen]);
+        appui[i] = HexCharsToInt(appEui[strLen-1], appEui[strLen]);
         strLen-=2;
     }
-    memcpy_P(buf, appeui, EUIIntLen);
+    memcpy_P(buf, appui, EUIIntLen);
 }
 
 void getdevEui(uint8_t *buf) {
     String devui = preferences.getString("DEVEUI");
     uint8_t deveui[EUIIntLen];
-    unsigned int strLen = devui.length();
+    unsigned int strLen = devui.length()-1;
     for(int i = 0; i < EUIIntLen; i++){
         deveui[i] = HexCharsToInt(devui.charAt(strLen-1), devui.charAt(strLen));
         strLen-=2;
@@ -44,7 +52,7 @@ AesKey getappKey() {
     String key = preferences.getString("APPKEY");
     uint8_t appkey[appKeyIntLen];
     int strLen = 0;
-    for(int i = 0; i < EUIIntLen; i++){
+    for(int i = 0; i < appKeyIntLen; i++){
         appkey[i] = HexCharsToInt(key.charAt(strLen), key.charAt(strLen+1));
         strLen+=2;
     }
@@ -57,10 +65,10 @@ bool KeysExistInPref(){
     String devui = preferences.getString("DEVEUI", "NOT SET");
     String key = preferences.getString("APPKEY", "NOT SET");
 
-    int deveuiNotSet = devui.compareTo("NOT SET");
-    int keyNotSet = key.compareTo("NOT SET");
+    bool deveuiNotSet = devui == "NOT SET";
+    bool keyNotSet = key == "NOT SET";
 
-    return (!deveuiNotSet && !keyNotSet);
+    return !(deveuiNotSet && keyNotSet);
 
 
 }

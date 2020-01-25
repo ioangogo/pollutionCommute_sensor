@@ -5,3 +5,5 @@
 void getdevEui(uint8_t *buf);
 AesKey getappKey();
 void getappEui(uint8_t *buf);
+
+bool KeysExistInPref();
