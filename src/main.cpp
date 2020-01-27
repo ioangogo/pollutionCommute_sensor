@@ -87,8 +87,8 @@ void setup() {
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
     packetSemaphore = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
     xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
+    xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
     xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
   }
   

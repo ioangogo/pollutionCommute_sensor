@@ -6,7 +6,7 @@
 #define GPS_Serial Serial2
 #define gpsPort GPS_Serial
 #define GPS_PORT_NAME "GPS_Serial 2"
-#define RXpin 2 //16 is used for OLED_RST ! If we are using GPS we can not use the OLED
+#define RXpin 37 //16 is used for OLED_RST ! If we are using GPS we can not use the OLED
 #define TXpin 17
 bool locGot = false;
 bool timeGot = false;

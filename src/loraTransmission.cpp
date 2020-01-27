@@ -70,7 +70,7 @@ void onEvent (EventType ev) {
 
 void LoraSend(void * param){
     for(;;){
-        if(sendFlag && ttnConnected){
+        if(sendFlag && ttnConnected && !sentFlag){
             digitalWrite(LED_BUILTIN, 0);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 // copy message buffer for packet
@@ -106,6 +106,10 @@ void LoraSend(void * param){
 }
 
 void ttnHandling(void * param){
+    /* while(!sendFlag){
+        // We wait for the packets to be ready before we start joining to reduce interference
+        vTaskDelay(1/portTICK_PERIOD_MS);
+    } */
     SPI.begin(5,19,27,18);
     os_init();
     LMIC.init();
