@@ -96,10 +96,12 @@ void LoraSend(void * param){
 
                 xSemaphoreGive(packetSemaphore);
             }
-        }else{
+        }else if (sendFlag && !ttnConnected){
             digitalRead(LED_BUILTIN) ? digitalWrite(LED_BUILTIN, 0): digitalWrite(LED_BUILTIN, 1);
+        }else{
+            digitalWrite(LED_BUILTIN, 0);
         }
-    vTaskDelay(1000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
+    vTaskDelay(2000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
     }
 }
 
