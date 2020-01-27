@@ -1,7 +1,3 @@
-// Redefining serial 1 pins so that hardware serial can be used
-#define TX1 13
-#define RX1 12
-
 #include <Arduino.h>
 #include <IotWebConf.h>
 #include <Preferences.h>
@@ -76,6 +72,7 @@ void setup() {
   delay(1000);//Allow the user to reset befor doing anything
 
   if(setupMode){
+    digitalWrite(LED_BUILTIN, 1);
     iotConf.addParameter(&devEUIConfig);
     iotConf.addParameter(&appkeyConfig);
     iotConf.init();
@@ -85,6 +82,7 @@ void setup() {
     server.onNotFound([](){ iotConf.handleNotFound(); });
   }else
   {
+    digitalWrite(LED_BUILTIN, 0);
     LoraPacket.sensorContent.pm25 = -1;
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;

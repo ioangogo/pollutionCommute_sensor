@@ -14,7 +14,7 @@ const lmic_pinmap lmic_pins = {
     .nss = 18,
     .prepare_antenna_tx = nullptr,
     .rst = 14,
-    .dio = {DIO0, DIO1}
+    .dio = {26, 35}
 };
 
 OsScheduler OSS;
@@ -33,6 +33,9 @@ void printHex2(unsigned v) {
 }
 void onEvent (EventType ev) {
     switch(ev) {
+        case EventType::JOIN_FAILED:
+            sleepFlag=true;
+            break;
         case EventType::JOINED:
             digitalWrite(LED_BUILTIN, 1);
             Serial.println(F("EventType::JOINED"));
@@ -68,6 +71,7 @@ void onEvent (EventType ev) {
 void LoraSend(void * param){
     for(;;){
         if(sendFlag && ttnConnected){
+            digitalWrite(LED_BUILTIN, 0);
             if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
                 // copy message buffer for packet
                 byte buf[PACKET_SIZE];
@@ -98,11 +102,6 @@ void LoraSend(void * param){
     vTaskDelay(1000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
     }
 }
-
-
-// Innitalising these with dummy values, we will strcpy over them later
-char const devEui[devEUILen] = "D0740BC175E5F4BE";
-char const appKey[appKeyLen] = "391F21F0D4859ED3249FE1C5DDB7C77E";
 
 void ttnHandling(void * param){
     SPI.begin(5,19,27,18);

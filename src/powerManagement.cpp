@@ -1,5 +1,7 @@
 #include <Arduino.h>
 #include "globals.hpp"
+#include "gps.hpp"
+#include "dustSensor.hpp"
 
 #define SLEEP_MINS 5
 
@@ -17,7 +19,12 @@ void startTimerDeepSleep()
     Serial.printf("Sleeping for %d Mins\n", SLEEP_MINS);
     sendFlag = false;
     sentFlag = false;
+    #ifndef NO_SENSORS
+    //Sleep Connected devices to save more power
+    sleepSDS();
+    deepsleepSleep();
+    #endif
     
-    esp_deep_sleep(1*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
+    esp_deep_sleep(SLEEP_MINS*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
     
 }

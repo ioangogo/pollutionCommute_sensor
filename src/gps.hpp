@@ -4,3 +4,4 @@
 
 void doGPSTask();
 void initGPS();
+void deepsleepSleep();

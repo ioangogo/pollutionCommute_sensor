@@ -21,22 +21,30 @@ void WakeDevice(HardwareSerial &serial){
     serial.write(WAKE_CMD);
 }
 
+void deepsleepSleep(){
+    if(gpsPort){
+        sleepDevice(gpsPort);
+    }
+}
+
 uint64_t Y2KtoUnix(uint32_t timestamp){
     return timestamp + Y2K_OFFSET;
 }
 unsigned long lastMilis = 0;
 
 void initGPS(){
+    #ifndef NO_SENSORS
     gpsPort.begin(9600, SERIAL_8N1, RXpin, TXpin);
     WakeDevice(gpsPort);
+    #endif
     
 }
 
 void doGPSTask(){
+    #ifndef NO_SENSORS
     while(gps.available(gpsPort)){
         fix = gps.read();
     }
-
     if(fix.valid.time && !timeGot){
         Serial.println("got Time");
         uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
@@ -57,4 +65,22 @@ void doGPSTask(){
             xSemaphoreGive(packetSemaphore);
         }
     }
+    #else
+    if(fix.valid.time && !timeGot){
+        gpslocTimeUnix = 1580121254;
+        timeGot = true;
+    }
+    if(!locGot){
+        Serial.println("got location");
+        // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
+        int lat = lround(51.4981278*10000);
+        int lng = lround(-2.5380904*10000);
+        if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+            LoraPacket.sensorContent.lat = lat;
+            LoraPacket.sensorContent.lng = lng;
+            locGot = true;
+            xSemaphoreGive(packetSemaphore);
+        }
+    }
+    #endif
 }

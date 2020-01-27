@@ -7,6 +7,7 @@
         "unordered_set": "cpp",
         "vector": "cpp",
         "initializer_list": "cpp",
-        "globals.hpp": "c"
+        "globals.hpp": "c",
+        "*.tcc": "cpp"
     }
 }
