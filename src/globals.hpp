@@ -13,6 +13,14 @@
 #define EUIIntLen 8
 #define appKeyIntLen 16
 
+enum States {
+    GPS,
+    SDS,
+    LORA_SEND,
+    LORA_FAILED,
+    SLEEP
+};
+
 extern Sensorpacket LoraPacket;
 extern SemaphoreHandle_t packetSemaphore;
 extern bool sendFlag;
