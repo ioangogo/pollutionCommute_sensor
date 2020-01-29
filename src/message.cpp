@@ -3,6 +3,8 @@
 #include "gps.hpp"
 #include "globals.hpp"
 #include "message.hpp"
+#include "loraTransmission.hpp"
+#include "powerManagement.hpp"
 
 int state = GPS;
 
@@ -21,6 +23,20 @@ void MessageStateMachine(){
         bool pmSet = LoraPacket.sensorContent.pm25 != -1;
         state = pmSet?LORA_SEND:SDS;
         break;
+
+        case LORA_SEND:
+        bool runOnce = false;
+        if(!runOnce){
+            runOnce = true;
+            loraInit();
+        }
+        loraLoop();
+        break;
+
+        case SLEEP:
+        startTimerDeepSleep();
+        break;
+        
 
     }
 

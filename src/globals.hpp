@@ -21,6 +21,8 @@ enum States {
     SLEEP
 };
 
+extern int state;
+
 extern Sensorpacket LoraPacket;
 extern SemaphoreHandle_t packetSemaphore;
 extern bool sendFlag;

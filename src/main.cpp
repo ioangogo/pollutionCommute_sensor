@@ -87,9 +87,9 @@ void setup() {
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
     packetSemaphore = xSemaphoreCreateMutex();
-    xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
-    xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
-    xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
+    //xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
+    //xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
+    //xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
   }
   
 }
@@ -98,13 +98,7 @@ void loop() {
   if(setupMode){
     iotConf.doLoop();
   }else{
-    if(sleepFlag){
-      startTimerDeepSleep();
-    }
-    if(sendFlag){//Wait for sensor data, trying to use the lora chip while using serial seems to cause interference
-      
-    }
-    vTaskDelay(portTICK_PERIOD_MS/20000); //allow other threads to run
+    MessageStateMachine();
   }
   // put your main code here, to run repeatedly:
 }

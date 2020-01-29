@@ -21,7 +21,7 @@ OsScheduler OSS;
 RadioSx1276 radio {lmic_pins};
 LmicEu868 LMIC {radio, OSS};
 
-//OsJob sendjob{OSS};
+OsJob sendjob{OSS};
 
 // Code from example code of the arduino-LMIC libary examples
 // Find original source here: https://github.com/mcci-catena/arduino-lmic/blob/master/examples/ttn-otaa/ttn-otaa.ino
@@ -34,7 +34,7 @@ void printHex2(unsigned v) {
 void onEvent (EventType ev) {
     switch(ev) {
         case EventType::JOIN_FAILED:
-            sleepFlag=true;
+            
             break;
         case EventType::JOINED:
             digitalWrite(LED_BUILTIN, 1);
@@ -48,11 +48,7 @@ void onEvent (EventType ev) {
             Serial.println(F("EventType::TXCOMPLETE (includes waiting for RX windows)"));
             if (LMIC.getTxRxFlags().test(TxRxStatus::ACK)) {
                 PRINT_DEBUG(1, F("Received ack"));
-                if(sentFlag == true){
-                    // reset send state and allow other processes to use packet
-                    sentFlag=false;
-                    sleepFlag=true;
-                }
+                state = SLEEP;
             }
             if (LMIC.getDataLen()) {
                 PRINT_DEBUG(1, F("Received %d bytes of payload"), LMIC.getDataLen());
@@ -68,40 +64,57 @@ void onEvent (EventType ev) {
 }
 // End of code from external source
 
-void LoraSend(void * param){
-    for(;;){
-        if(sendFlag && ttnConnected && !sentFlag){
-            digitalWrite(LED_BUILTIN, 0);
-            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                // copy message buffer for packet
-                byte buf[PACKET_SIZE];
-                memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
+void LoraSend(){
+    if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+        // copy message buffer for packet
+        byte buf[PACKET_SIZE];
+        memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
 
-                for(int i = 0; i < PACKET_SIZE; i++){
-                    Serial.printf("%02X", buf[i]);
-                }
-                Serial.println();
-
-                //Set the packet as the next thing to be transmitted
-                LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
-
-                // reset packet
-                LoraPacket.sensorContent.pm25 = -1;
-                LoraPacket.sensorContent.lat = GPS_NULL;
-                LoraPacket.sensorContent.lng = GPS_NULL;
-                
-                // Signal to the main loop that we have sent the message
-                sentFlag = true;
-                Serial.println("Sent Packet");
-
-                xSemaphoreGive(packetSemaphore);
-            }
-        }else if (sendFlag && !ttnConnected){
-            digitalRead(LED_BUILTIN) ? digitalWrite(LED_BUILTIN, 0): digitalWrite(LED_BUILTIN, 1);
-        }else{
-            digitalWrite(LED_BUILTIN, 0);
+        for(int i = 0; i < PACKET_SIZE; i++){
+            Serial.printf("%02X", buf[i]);
         }
-    vTaskDelay(2000/portTICK_PERIOD_MS);//Give other tasks a chance to run on the processor
+        Serial.println();
+
+        //Set the packet as the next thing to be transmitted
+        LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
+
+        // reset packet
+        LoraPacket.sensorContent.pm25 = -1;
+        LoraPacket.sensorContent.lat = GPS_NULL;
+        LoraPacket.sensorContent.lng = GPS_NULL;
+        
+        // Signal to the main loop that we have sent the message
+        sentFlag = true;
+        Serial.println("Sent Packet");
+
+        xSemaphoreGive(packetSemaphore);
+    }
+}
+
+void loraInit(){
+    SPI.begin(5,19,27,18);
+    os_init();
+    LMIC.init();
+    LMIC.reset();
+    LMIC.setEventCallBack(onEvent);
+    LMIC.setArtEuiCallback(getappEui);
+    LMIC.setDevKey(getappKey());
+    LMIC.setDevEuiCallback(getdevEui);
+
+
+    LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
+    //LMIC.setAntennaPowerAdjustment(-14);
+    sendjob.setCallbackRunnable(LoraSend);
+}
+
+void loraLoop(){
+    while(true){
+        OsDeltaTime to_wait = OSS.runloopOnce();
+        //Due to timings we only want to free up the processor
+        //to other tasks if the time we have to wait is larger than 10 seconds
+        if(to_wait > OsDeltaTime(10)){
+            delay(to_wait.to_ms);
+        }
     }
 }
 
