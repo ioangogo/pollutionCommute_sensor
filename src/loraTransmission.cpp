@@ -34,7 +34,7 @@ void printHex2(unsigned v) {
 void onEvent (EventType ev) {
     switch(ev) {
         case EventType::JOIN_FAILED:
-            
+            state=LORA_FAILED;
             break;
         case EventType::JOINED:
             digitalWrite(LED_BUILTIN, 1);
@@ -65,30 +65,24 @@ void onEvent (EventType ev) {
 // End of code from external source
 
 void LoraSend(){
-    if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-        // copy message buffer for packet
-        byte buf[PACKET_SIZE];
-        memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
+    // copy message buffer for packet
+    byte buf[PACKET_SIZE];
+    memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
 
-        for(int i = 0; i < PACKET_SIZE; i++){
-            Serial.printf("%02X", buf[i]);
-        }
-        Serial.println();
-
-        //Set the packet as the next thing to be transmitted
-        LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
-
-        // reset packet
-        LoraPacket.sensorContent.pm25 = -1;
-        LoraPacket.sensorContent.lat = GPS_NULL;
-        LoraPacket.sensorContent.lng = GPS_NULL;
-        
-        // Signal to the main loop that we have sent the message
-        sentFlag = true;
-        Serial.println("Sent Packet");
-
-        xSemaphoreGive(packetSemaphore);
+    for(int i = 0; i < PACKET_SIZE; i++){
+        Serial.printf("%02X", buf[i]);
     }
+    Serial.println();
+
+    //Set the packet as the next thing to be transmitted
+    LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
+
+    // reset packet
+    LoraPacket.sensorContent.pm25 = -1;
+    LoraPacket.sensorContent.lat = GPS_NULL;
+    LoraPacket.sensorContent.lng = GPS_NULL;
+    
+    Serial.println("Sent Packet");
 }
 
 void loraInit(){

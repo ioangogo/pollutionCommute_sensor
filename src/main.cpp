@@ -10,9 +10,8 @@
 #include "gps.hpp"
 #include "keyHandling.hpp"
 
-// Global varible for the tasks, will be semaphore protected
+// Global varible for the tasks
 Sensorpacket LoraPacket;
-SemaphoreHandle_t packetSemaphore;
 bool sendFlag = false; // Flag to tell the lora task to send
 bool sentFlag = false; 
 bool sleepFlag = false;// flag to tell the system to deep sleep
