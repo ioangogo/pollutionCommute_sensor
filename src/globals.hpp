@@ -16,6 +16,7 @@
 enum States {
     GPS,
     SDS,
+    LORA_JOIN,
     LORA_SEND,
     LORA_FAILED,
     SLEEP

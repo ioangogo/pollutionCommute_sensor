@@ -87,9 +87,7 @@ void setup() {
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
     packetSemaphore = xSemaphoreCreateMutex();
-    //xTaskCreatePinnedToCore(ttnHandling, "HandelTTN", 2048, NULL, 1, NULL, 1);
-    //xTaskCreatePinnedToCore(LoraSend, "sendTask", 2048, NULL, 2, NULL, 1);
-    //xTaskCreatePinnedToCore(checkSendTask, "checksendTask", 2048, NULL, 2, NULL, 0);
+    xTaskCreatePinnedToCore(stateLedThread, "stateLedThread", 2048, NULL, 2, NULL, 0);
   }
   
 }
@@ -100,7 +98,6 @@ void loop() {
   }else{
     MessageStateMachine();
   }
-  // put your main code here, to run repeatedly:
 }
 
 // Store the save settings in the prefrences so we dont have to start the config to get them

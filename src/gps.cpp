@@ -42,27 +42,27 @@ void initGPS(){
 
 void doGPSTask(){
     #ifndef NO_SENSORS
-    while(gps.available(gpsPort)){
+    while(gps.available(gpsPort) && !locGot){
         fix = gps.read();
-    }
-    if(fix.valid.time && !timeGot){
-        Serial.println("got Time");
-        uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
-        uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
-        //timeGot = true;
-        gpslocTimeUnix = unixtimestamp;
-    }
-    if(fix.valid.location && !locGot){
-        Serial.println("got location");
-        // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
-        int lat = lround(fix.latitude()*1000);
-        int lng = lround(fix.longitude()*1000);
-        if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-            LoraPacket.sensorContent.lat = lat;
-            LoraPacket.sensorContent.lat = lng;
-            locGot = true;
-            sleepDevice(gpsPort);
-            xSemaphoreGive(packetSemaphore);
+        if(fix.valid.time && !timeGot){
+            Serial.println("got Time");
+            uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
+            uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
+            //timeGot = true;
+            gpslocTimeUnix = unixtimestamp;
+        }
+        if(fix.valid.location){
+            Serial.println("got location");
+            // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
+            int lat = lround(fix.latitude()*10000);
+            int lng = lround(fix.longitude()*10000);
+            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
+                LoraPacket.sensorContent.lat = lat;
+                LoraPacket.sensorContent.lat = lng;
+                locGot = true;
+                sleepDevice(gpsPort);
+                xSemaphoreGive(packetSemaphore);
+            }
         }
     }
     #else
