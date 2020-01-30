@@ -10,6 +10,13 @@ int state = GPS;
 
 String PacketToJson(Sensorpacket pkt);
 
+void stateLedThread(void *Param){
+    for(;;){
+        digitalRead(LED_BUILTIN)?digitalWrite(LED_BUILTIN,0):digitalWrite(LED_BUILTIN,1);
+        delay(state+1*1000);
+    }
+}
+
 void MessageStateMachine(){
     switch(state){
         case GPS:

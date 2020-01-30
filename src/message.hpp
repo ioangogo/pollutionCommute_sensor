@@ -22,6 +22,6 @@ typedef union{
 
 String PacketToJson(Sensorpacket pkt);
 
-void checkSendTask( void *Param);
+void stateLedThread( void *Param);
 
 void MessageStateMachine();
