@@ -56,8 +56,11 @@ void doGPSTask(){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
             int lat = lround(fix.latitude()*10000);
             int lng = lround(fix.longitude()*10000);
+            Serial.printf("GPS LAT: %f, GPS LNG: %f\n",fix.latitude(), fix.longitude());
+
             LoraPacket.sensorContent.lat = lat;
-            LoraPacket.sensorContent.lat = lng;
+            LoraPacket.sensorContent.lng = lng;
+            Serial.printf("GPS LAT: %i, GPS LNG: %i\n",lat, lng);
             locGot = true;
             sleepDevice(gpsPort);
         }

@@ -20,6 +20,9 @@ void sleepSDS(){
     }
 }
 
+int samples = 3;
+float sample = 0.0;
+
 void initSDS(){
     #ifndef NO_SENSORS
     my_sds.begin(&sdsSerial, dustRX, dustTX);
@@ -38,15 +41,21 @@ void doSDS(){
     int err;
     unsigned long timeSinceInit = millis() - startMilis;
     if(notcap && timeSinceInit >= 30000){
-        err = my_sds.read(&pm25, &pm10);
-        if(err == 0){
-            Serial.printf("%f\r\n", pm25);
-            Serial.println("got pm2.5");
-            LoraPacket.sensorContent.pm25 = lround(pm25*10);
-            my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
-            notcap = false; 
+        while(samples >0){
+            err = my_sds.read(&pm25, &pm10);
+            if(err == 0){
+                Serial.printf("%f\r\n", pm25);
+                Serial.println("got pm2.5");
+                sample+=pm25;
+                samples -=1;
+                delay(10000);
             }
         }
+    }
+    if(samples==0){
+        sample=sample/3;
+        LoraPacket.sensorContent.pm25 = lround(sample*10);
+    }
     
     #else
     if(notcap){
