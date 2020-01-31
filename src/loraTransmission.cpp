@@ -110,7 +110,7 @@ void loraLoop(){
     }
 }
 
-void ttnHandling(void * param){
+/* void ttnHandling(void * param){
     /* while(!sendFlag){
         // We wait for the packets to be ready before we start joining to reduce interference
         vTaskDelay(1/portTICK_PERIOD_MS);
@@ -141,4 +141,4 @@ void ttnHandling(void * param){
         //Give other tasks a chance to run on the processor
     }
     
-}
+} */
