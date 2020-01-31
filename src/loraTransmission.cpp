@@ -111,10 +111,6 @@ void loraLoop(){
 }
 
 /* void ttnHandling(void * param){
-    /* while(!sendFlag){
-        // We wait for the packets to be ready before we start joining to reduce interference
-        vTaskDelay(1/portTICK_PERIOD_MS);
-    } */
     SPI.begin(5,19,27,18);
     os_init();
     LMIC.init();
