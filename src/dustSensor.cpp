@@ -34,7 +34,6 @@ void SDSstateInit(){
 
 void doSDS(){
     #ifndef NO_SENSORS
-
     float pm10, pm25;
     int err;
     unsigned long timeSinceInit = millis() - startMilis;

@@ -37,9 +37,7 @@ void onEvent (EventType ev) {
             state=LORA_FAILED;
             break;
         case EventType::JOINED:
-            digitalWrite(LED_BUILTIN, 1);
             Serial.println(F("EventType::JOINED"));
-            ttnConnected = true;
             break;
         case EventType::JOINING:
             Serial.println(F("EventType::JOINING"));
