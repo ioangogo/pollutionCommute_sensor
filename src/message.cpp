@@ -20,17 +20,20 @@ void stateLedThread(void *Param){
 void MessageStateMachine(){
     switch(state){
         case INIT:{
+            Serial.println("Inital Init");
             initGPS();
             initSDS();
             state = GPS;
+            Serial.println("GPS Sate");
         }
         case GPS:{
             doGPSTask();
             bool gpsSet = LoraPacket.sensorContent.lat != GPS_NULL && LoraPacket.sensorContent.lng != GPS_NULL;
-            state = gpsSet?SDS:GPS;
+            state = gpsSet?SDS_INIT:GPS;
             break;
         }
         case SDS_INIT:{
+            Serial.println("SDS state");
             SDSstateInit();
             state = SDS;
             break;
@@ -38,10 +41,11 @@ void MessageStateMachine(){
         case SDS:{
             doSDS();
             bool pmSet = LoraPacket.sensorContent.pm25 != -1;
-            state = pmSet?LORA_SEND:SDS;
+            state = pmSet?LORA_JOIN:SDS;
             break;
         }
         case LORA_JOIN:{
+            Serial.println("Send State");
             loraInit();
             state=LORA_SEND;
             break;
@@ -51,6 +55,7 @@ void MessageStateMachine(){
             break;
         }
         case SLEEP:{
+            Serial.println("sleeping");
             startTimerDeepSleep();
             break;
         }
