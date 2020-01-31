@@ -107,7 +107,7 @@ void loraLoop(){
         //Due to timings we only want to free up the processor
         //to other tasks if the time we have to wait is larger than 10 seconds
         if(to_wait > OsDeltaTime(10)){
-            delay(to_wait.to_ms);
+            delay(to_wait.to_ms());
         }
     }
 }

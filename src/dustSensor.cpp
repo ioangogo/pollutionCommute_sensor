@@ -23,13 +23,18 @@ void sleepSDS(){
 void initSDS(){
     #ifndef NO_SENSORS
     my_sds.begin(&sdsSerial, dustRX, dustTX);
+    my_sds.sleep();
+    #endif
+}
+
+void SDSstateInit(){
     my_sds.wakeup();
     startMilis = millis();
-    #endif
 }
 
 void doSDS(){
     #ifndef NO_SENSORS
+
     float pm10, pm25;
     int err;
     unsigned long timeSinceInit = millis() - startMilis;
@@ -37,15 +42,13 @@ void doSDS(){
         err = my_sds.read(&pm25, &pm10);
         if(err == 0){
             Serial.printf("%f\r\n", pm25);
-            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                Serial.println("got pm2.5");
-                LoraPacket.sensorContent.pm25 = lround(pm25*10);
-                my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
-                notcap = false;
-                xSemaphoreGive(packetSemaphore);   
+            Serial.println("got pm2.5");
+            LoraPacket.sensorContent.pm25 = lround(pm25*10);
+            my_sds.sleep();// Send sensor to sleep(turn fan off) to save power while we dont need data
+            notcap = false; 
             }
         }
-    }
+    
     #else
     if(notcap){
     if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){

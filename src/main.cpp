@@ -85,7 +85,6 @@ void setup() {
     LoraPacket.sensorContent.pm25 = -1;
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
-    packetSemaphore = xSemaphoreCreateMutex();
     xTaskCreatePinnedToCore(stateLedThread, "stateLedThread", 2048, NULL, 2, NULL, 0);
   }
   

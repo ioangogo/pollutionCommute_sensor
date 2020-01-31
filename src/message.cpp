@@ -6,7 +6,7 @@
 #include "loraTransmission.hpp"
 #include "powerManagement.hpp"
 
-int state = GPS;
+int state = INIT;
 
 String PacketToJson(Sensorpacket pkt);
 
@@ -19,26 +19,41 @@ void stateLedThread(void *Param){
 
 void MessageStateMachine(){
     switch(state){
-        case GPS:
+        case INIT:{
+            initGPS();
+            initSDS();
+            state = GPS;
+        }
+        case GPS:{
             doGPSTask();
             bool gpsSet = LoraPacket.sensorContent.lat != GPS_NULL && LoraPacket.sensorContent.lng != GPS_NULL;
             state = gpsSet?SDS:GPS;
             break;
-        case SDS:
+        }
+        case SDS_INIT:{
+            SDSstateInit();
+            state = SDS;
+            break;
+        }
+        case SDS:{
             doSDS();
             bool pmSet = LoraPacket.sensorContent.pm25 != -1;
             state = pmSet?LORA_SEND:SDS;
             break;
-        case LORA_JOIN:
+        }
+        case LORA_JOIN:{
             loraInit();
             state=LORA_SEND;
             break;
-        case LORA_SEND:
+        }
+        case LORA_SEND:{
             loraLoop();
             break;
-        case SLEEP:
+        }
+        case SLEEP:{
             startTimerDeepSleep();
             break;
+        }
     }
 
 }

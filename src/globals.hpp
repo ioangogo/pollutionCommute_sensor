@@ -13,14 +13,20 @@
 #define EUIIntLen 8
 #define appKeyIntLen 16
 
+#ifndef enumStates_H
+#define enumStates_H
+
 enum States {
+    INIT,
     GPS,
+    SDS_INIT,
     SDS,
     LORA_JOIN,
     LORA_SEND,
     LORA_FAILED,
     SLEEP
 };
+#endif
 
 extern int state;
 

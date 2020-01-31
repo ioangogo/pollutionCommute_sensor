@@ -56,13 +56,10 @@ void doGPSTask(){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
             int lat = lround(fix.latitude()*10000);
             int lng = lround(fix.longitude()*10000);
-            if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
-                LoraPacket.sensorContent.lat = lat;
-                LoraPacket.sensorContent.lat = lng;
-                locGot = true;
-                sleepDevice(gpsPort);
-                xSemaphoreGive(packetSemaphore);
-            }
+            LoraPacket.sensorContent.lat = lat;
+            LoraPacket.sensorContent.lat = lng;
+            locGot = true;
+            sleepDevice(gpsPort);
         }
     }
     #else
