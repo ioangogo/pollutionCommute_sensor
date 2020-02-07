@@ -63,17 +63,16 @@ void onEvent (EventType ev) {
 // End of code from external source
 
 void LoraSend(){
-    // copy message buffer for packet
-    byte buf[PACKET_SIZE];
-    memcpy(buf, LoraPacket.packetBytes, PACKET_SIZE);
-
+  if (LMIC.getOpMode().test(OpState::TXRXPEND)) {
+    PRINT_DEBUG(1, F("OpState::TXRXPEND, not sending"));
+  } else {
     for(int i = 0; i < PACKET_SIZE; i++){
-        Serial.printf("%02X", buf[i]);
+        Serial.printf("%02X", LoraPacket.packetBytes[i]);
     }
     Serial.println();
 
     //Set the packet as the next thing to be transmitted
-    LMIC.setTxData2(2, buf, PACKET_SIZE, 0);
+    LMIC.setTxData2(2, LoraPacket.packetBytes, PACKET_SIZE, 0);
 
     // reset packet
     LoraPacket.sensorContent.pm25 = -1;
@@ -81,6 +80,7 @@ void LoraSend(){
     LoraPacket.sensorContent.lng = GPS_NULL;
     
     Serial.println("Sent Packet");
+  }
 }
 
 void loraInit(){
@@ -100,13 +100,14 @@ void loraInit(){
 }
 
 void loraLoop(){
-    while(true){
+    while(state == LORA_SEND){
         OsDeltaTime to_wait = OSS.runloopOnce();
         //Due to timings we only want to free up the processor
         //to other tasks if the time we have to wait is larger than 10 seconds
         if(to_wait > OsDeltaTime(10)){
             delay(to_wait.to_ms());
-        }
+    
+    }
     }
 }
 

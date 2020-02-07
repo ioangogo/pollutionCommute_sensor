@@ -55,6 +55,7 @@ void doSDS(){
     if(samples==0){
         sample=sample/3;
         LoraPacket.sensorContent.pm25 = lround(sample*10);
+        my_sds.sleep();
     }
     
     #else
