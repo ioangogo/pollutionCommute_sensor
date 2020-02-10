@@ -71,6 +71,8 @@ void LoraSend(){
     }
     Serial.println();
 
+    //LMIC.setDrTx(SF12);
+
     //Set the packet as the next thing to be transmitted
     LMIC.setTxData2(2, LoraPacket.packetBytes, PACKET_SIZE, 0);
 
@@ -94,17 +96,20 @@ void loraInit(){
     LMIC.setDevEuiCallback(getdevEui);
 
 
-    LMIC.setClockError(MAX_CLOCK_ERROR * 5 / 100);
-    //LMIC.setAntennaPowerAdjustment(-14);
+    LMIC.setClockError(MAX_CLOCK_ERROR*(30 / 100));
+    LMIC.setAntennaPowerAdjustment(-14);
     sendjob.setCallbackRunnable(LoraSend);
 }
 
 void loraLoop(){
-    OsDeltaTime to_wait = OSS.runloopOnce();
-    //Due to timings we only want to free up the processor
-    //to other tasks if the time we have to wait is larger than 10 seconds
-    if(to_wait > OsDeltaTime(10)){
-        delay(to_wait.to_ms());
+    //Doing the rest of the loop takes too long, lets wait here
+    while(state == LORA_SEND){
+        OsDeltaTime to_wait = OSS.runloopOnce();
+        //Due to timings we only want to free up the processor
+        //to other tasks if the time we have to wait is larger than 10 seconds
+        if(to_wait > OsDeltaTime(6)){
+            delay(to_wait.to_ms());
+        }
     }
 }
 

@@ -31,8 +31,10 @@ void initSDS(){
 }
 
 void SDSstateInit(){
+    #ifndef NO_SENSORS
     my_sds.wakeup();
     startMilis = millis();
+    #endif
 }
 
 void doSDS(){
@@ -60,11 +62,9 @@ void doSDS(){
     
     #else
     if(notcap){
-    if(xSemaphoreTake(packetSemaphore, portMAX_DELAY) == pdTRUE){
         Serial.println("got pm2.5");
         LoraPacket.sensorContent.pm25 = lround(10.5*10);
         notcap = false;
-        xSemaphoreGive(packetSemaphore);   
-    }}
+    }
     #endif
 }
