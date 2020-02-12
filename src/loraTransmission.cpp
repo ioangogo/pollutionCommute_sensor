@@ -74,7 +74,7 @@ void LoraSend(){
     //LMIC.setDrTx(SF12);
 
     //Set the packet as the next thing to be transmitted
-    LMIC.setTxData2(2, LoraPacket.packetBytes, PACKET_SIZE, 0);
+    LMIC.setTxData2(2, LoraPacket.packetBytes, PACKET_SIZE, true);
 
     // reset packet
     LoraPacket.sensorContent.pm25 = -1;
@@ -101,7 +101,7 @@ void loraInit(){
     //Following what the developer of the libary is doing to reduce power draw from radio
     //power instablity might be causing issues.
     //I might need to get a better USB cable as the one i am currently using struggles under load from some quick testing with a usb load
-    LMIC.setAntennaPowerAdjustment(-14);
+    LMIC.setAntennaPowerAdjustment(-10);
     sendjob.setCallbackRunnable(LoraSend);
 }
 
