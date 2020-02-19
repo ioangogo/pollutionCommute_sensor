@@ -6,6 +6,7 @@
 */
 #include "SPIFFS.h"
 #include "message.hpp"
+#include "globals.hpp"
 
 bool initFileSystem(){
     if(!SPIFFS.begin(true)){
@@ -13,6 +14,10 @@ bool initFileSystem(){
     }else{
         return true;
     }
+}
+
+void failedmessageState(){
+    state=SLEEP;
 }
 
 bool writeMessage(Sensorpacket message){

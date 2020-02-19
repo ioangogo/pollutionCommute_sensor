@@ -5,6 +5,7 @@
 #include "message.hpp"
 #include "loraTransmission.hpp"
 #include "powerManagement.hpp"
+#include "fileSystemAccess.hpp"
 
 int state = INIT;
 
@@ -54,6 +55,8 @@ void MessageStateMachine(){
             loraLoop();
             break;
         }
+        case LORA_FAILED:
+
         case SLEEP:{
             Serial.println("sleeping");
             startTimerDeepSleep();

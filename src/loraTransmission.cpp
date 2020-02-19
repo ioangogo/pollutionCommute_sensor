@@ -33,6 +33,8 @@ void printHex2(unsigned v) {
 }
 void onEvent (EventType ev) {
     switch(ev) {
+        case EventType::REJOIN_FAILED:
+        case EventType::LINK_DEAD:
         case EventType::JOIN_FAILED:
             state=LORA_FAILED;
             break;
@@ -101,7 +103,7 @@ void loraInit(){
     //Following what the developer of the libary is doing to reduce power draw from radio
     //power instablity might be causing issues.
     //I might need to get a better USB cable as the one i am currently using struggles under load from some quick testing with a usb load
-    LMIC.setAntennaPowerAdjustment(-10);
+    LMIC.setAntennaPowerAdjustment(-8);
     sendjob.setCallbackRunnable(LoraSend);
 }
 
