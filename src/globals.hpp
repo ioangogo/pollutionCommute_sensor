@@ -5,8 +5,8 @@
 
 #define Y2K_OFFSET 946684800
 #define GPS_NULL 333.3333*10000
-#define uS_TO_S_FACTOR 1000000
-#define MIN_TO_MS 60*uS_TO_S_FACTOR 
+#define MS_TO_S_FACTOR 1000
+#define MIN_TO_MS 60*MS_TO_S_FACTOR 
 #define devEUILen 17
 #define appKeyLen 33
 

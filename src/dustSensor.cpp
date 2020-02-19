@@ -42,7 +42,7 @@ void doSDS(){
     float pm10, pm25;
     int err;
     unsigned long timeSinceInit = millis() - startMilis;
-    if(notcap && timeSinceInit >= 30000){
+    if(notcap && timeSinceInit >= 30*MS_TO_S_FACTOR){
         while(samples >0){
             err = my_sds.read(&pm25, &pm10);
             if(err == 0){
@@ -50,7 +50,7 @@ void doSDS(){
                 Serial.println("got pm2.5");
                 sample+=pm25;
                 samples -=1;
-                delay(10000);
+                delay(3*MS_TO_S_FACTOR);
             }
         }
     }
