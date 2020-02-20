@@ -25,6 +25,6 @@ void startTimerDeepSleep()
     deepsleepSleep();
     #endif
     
-    esp_deep_sleep(SLEEP_MINS*MIN_TO_MS);//Set Deepsleep timer for when we will go back to sleep
+    esp_deep_sleep(SLEEP_MINS*MIN_TO_US);//Set Deepsleep timer for when we will go back to sleep
     
 }

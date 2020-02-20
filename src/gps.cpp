@@ -23,6 +23,7 @@ void WakeDevice(HardwareSerial &serial){
 
 void deepsleepSleep(){
     if(gpsPort){
+        WakeDevice(gpsPort);
         sleepDevice(gpsPort);
     }
 }

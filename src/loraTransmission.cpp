@@ -33,7 +33,6 @@ void printHex2(unsigned v) {
 }
 void onEvent (EventType ev) {
     switch(ev) {
-        case EventType::REJOIN_FAILED:
         case EventType::LINK_DEAD:
         case EventType::JOIN_FAILED:
             state=LORA_FAILED;
@@ -49,6 +48,11 @@ void onEvent (EventType ev) {
             if (LMIC.getTxRxFlags().test(TxRxStatus::ACK)) {
                 PRINT_DEBUG(1, F("Received ack"));
                 state = SLEEP;
+            }else if(LMIC.getTxRxFlags().test(TxRxStatus::NACK)){
+                // Although annother attempt could be made
+                // It was found that some gateways returned the wrong address and the sensor would get stuck retransmitting
+                state = LORA_FAILED;
+                
             }
             if (LMIC.getDataLen()) {
                 PRINT_DEBUG(1, F("Received %d bytes of payload"), LMIC.getDataLen());
