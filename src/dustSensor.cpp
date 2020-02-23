@@ -48,7 +48,7 @@ void doSDS(){
             if(err == 0){
                 Serial.printf("%f\r\n", pm25);
                 Serial.println("got pm2.5");
-                sample+=pm25;
+                sample += pm25;
                 samples -=1;
                 delay(3*MS_TO_S_FACTOR);
             }

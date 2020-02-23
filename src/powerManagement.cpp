@@ -19,11 +19,6 @@ void startTimerDeepSleep()
     Serial.printf("Sleeping for %d Mins\n", SLEEP_MINS);
     sendFlag = false;
     sentFlag = false;
-    #ifndef NO_SENSORS
-    //Sleep Connected devices to save more power
-    sleepSDS();
-    deepsleepSleep();
-    #endif
     
     esp_deep_sleep(SLEEP_MINS*MIN_TO_US);//Set Deepsleep timer for when we will go back to sleep
     
