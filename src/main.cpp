@@ -67,8 +67,8 @@ void setup() {
       counter = 0;
     }
   }
-  preferences.putUInt("counter", counter); // save the counter
-  delay(1000);//Allow the user to reset befor doing anything
+  
+  delay(2000);//Allow the user to reset befor doing anything
 
   if(setupMode){
     digitalWrite(LED_BUILTIN, 1);
@@ -79,14 +79,15 @@ void setup() {
     server.on("/", handleRoot);
     server.on("/config", []{ iotConf.handleConfig(); });
     server.onNotFound([](){ iotConf.handleNotFound(); });
-  }else
-  {
+  }else{
     digitalWrite(LED_BUILTIN, 0);
+    counter = 0;
     LoraPacket.sensorContent.pm25 = -1;
     LoraPacket.sensorContent.lat = GPS_NULL;
     LoraPacket.sensorContent.lng = GPS_NULL;
     xTaskCreatePinnedToCore(stateLedThread, "stateLedThread", 2048, NULL, 2, NULL, 0);
   }
+  preferences.putUInt("counter", counter); // save the counter
   
 }
 
