@@ -28,7 +28,7 @@ void deepsleepSleep(){
     }
 }
 
-uint64_t Y2KtoUnix(uint32_t timestamp){
+unsigned long Y2KtoUnix(uint32_t timestamp){
     return timestamp + Y2K_OFFSET;
 }
 unsigned long lastMilis = 0;
@@ -48,7 +48,7 @@ void doGPSTask(){
         if(fix.valid.time && !timeGot){
             Serial.println("got Time");
             uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
-            uint64_t unixtimestamp = Y2KtoUnix(UTCy2k);
+            unsigned long unixtimestamp = Y2KtoUnix(UTCy2k);
             //timeGot = true;
             gpslocTimeUnix = unixtimestamp;
         }

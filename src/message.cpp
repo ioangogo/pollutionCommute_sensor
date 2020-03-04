@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <ArduinoJson.h>
 #include "dustSensor.hpp"
 #include "gps.hpp"
 #include "globals.hpp"
@@ -9,7 +10,21 @@
 
 int state = INIT;
 
-String PacketToJson(Sensorpacket pkt);
+String PacketToJson(Sensorpacket pkt, unsigned long time){
+    const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4);
+    DynamicJsonDocument doc(capacity);
+
+    doc["sensor"] = "291A45544A0FA55D";
+    doc["time"] = time;
+
+    JsonObject data = doc.createNestedObject("data");
+    data["pm25"] = pkt.sensorContent.pm25;
+    data["lat"] = pkt.sensorContent.lat;
+    data["lng"] = pkt.sensorContent.lng;
+    data["nonce"] = pkt.sensorContent.nonce;
+
+    serializeJson(doc, Serial);
+}
 
 void stateLedThread(void *Param){
     for(;;){
@@ -21,6 +36,10 @@ void stateLedThread(void *Param){
 void MessageStateMachine(){
     switch(state){
         case INIT:{
+            // to make sure we dont send the same packet twice to the webserver
+            // we generate a random number
+            LoraPacket.sensorContent.nonce = esp_random();
+
             Serial.println("Inital Init");
             initGPS();
             initSDS();

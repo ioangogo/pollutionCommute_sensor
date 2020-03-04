@@ -37,6 +37,6 @@ extern bool sendFlag;
 extern bool sleepFlag; // This is to send the device into deep sleep when needed
 extern bool sentFlag; // This is to send the device into deep sleep when needed
 extern bool ttnConnected;
-extern uint64_t gpslocTimeUnix;//unix time of a GPS lock, using a 64bit interger becuse we are close to 2038
+extern unsigned long gpslocTimeUnix;//unix time of a GPS lock, using a 64bit interger becuse we are close to 2038
 
 extern Preferences preferences;

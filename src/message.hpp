@@ -8,16 +8,30 @@ typedef struct
     int pm25;
     int lat;
     int lng;
+    int nonce;
 } sensorData;
 
 #define PACKET_SIZE (int)sizeof(sensorData)
 #define INT_SIZE sizeof(int)
-#define long_SIZE sizeof(uint64_t)
+
+typedef struct
+{
+    byte packetBytes[PACKET_SIZE];
+    long time;
+} sensorFileStruct;
+
+#define FILE_SIZE (int)sizeof(sensorFileStruct)
 
 typedef union{
     sensorData sensorContent;
     byte packetBytes[PACKET_SIZE];
 } Sensorpacket;
+
+typedef union{
+    sensorFileStruct fileContent;
+    byte fileBytes[FILE_SIZE];
+} SensorFile;
+
 #endif
 
 String PacketToJson(Sensorpacket pkt);

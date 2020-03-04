@@ -16,7 +16,7 @@ bool sendFlag = false; // Flag to tell the lora task to send
 bool sentFlag = false; 
 bool sleepFlag = false;// flag to tell the system to deep sleep
 bool ttnConnected = false; // decide what we should do with the mesurements
-uint64_t gpslocTimeUnix;
+unsigned long gpslocTimeUnix;
 Preferences preferences;
 
 const char deviceName[] = "commutePollution";

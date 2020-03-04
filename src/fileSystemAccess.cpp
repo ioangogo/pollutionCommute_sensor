@@ -16,8 +16,10 @@ bool initFileSystem(){
     }
 }
 
-void failedmessageState(){
-    state=SLEEP;
+SensorFile loadFile (File file){
+    SensorFile out;
+    file.read(out.fileBytes, FILE_SIZE);
+    return out;
 }
 
 bool writeMessage(Sensorpacket message){
@@ -26,9 +28,24 @@ bool writeMessage(Sensorpacket message){
     if (msgSize > remainingFsBytes){
         return false;
     }else{
+        String filename="/msgs/";
+        String time = String(gpslocTimeUnix, 10);
+        filename.concat(time);
+        filename.concat(".msg");
         File messageFile = SPIFFS.open("/msgs/{time}.msg", FILE_WRITE);
-        messageFile.write(message.packetBytes, PACKET_SIZE);
+        
+        SensorFile file;
+
+        memcpy(file.fileContent.packetBytes, message.packetBytes, PACKET_SIZE);
+        file.fileContent.time = gpslocTimeUnix;
+
+        messageFile.write(file.fileBytes, FILE_SIZE);
         messageFile.close();
         return true;
     }
+}
+
+void failedmessageState(){
+    writeMessage(LoraPacket);
+    state=SLEEP;
 }
