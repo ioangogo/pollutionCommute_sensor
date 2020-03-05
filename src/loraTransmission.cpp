@@ -92,6 +92,7 @@ void LoraSend(){
 }
 
 void loraInit(){
+    #ifndef TEST_FAIL
     SPI.begin(5,19,27,18);
     os_init();
     LMIC.init();
@@ -109,9 +110,11 @@ void loraInit(){
     //I might need to get a better USB cable as the one i am currently using struggles under load from some quick testing with a usb load
     LMIC.setAntennaPowerAdjustment(-8);
     sendjob.setCallbackRunnable(LoraSend);
+    #endif
 }
 
 void loraLoop(){
+    #ifndef TEST_FAIL
     //Doing the rest of the loop takes too long, lets wait here
     while(state == LORA_SEND){
         OsDeltaTime to_wait = OSS.runloopOnce();
@@ -121,6 +124,12 @@ void loraLoop(){
             delay(to_wait.to_ms());
         }
     }
+    #else
+    for(int i = 0; i < PACKET_SIZE; i++){
+        Serial.printf("%02X", LoraPacket.packetBytes[i]);
+    }
+    state = LORA_FAILED;
+    #endif
 }
 
 /* void ttnHandling(void * param){

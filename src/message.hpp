@@ -34,7 +34,7 @@ typedef union{
 
 #endif
 
-String PacketToJson(Sensorpacket pkt);
+String PacketToJson(Sensorpacket pkt, unsigned long time);
 
 void stateLedThread( void *Param);
 

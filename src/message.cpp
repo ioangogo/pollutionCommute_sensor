@@ -11,6 +11,7 @@
 int state = INIT;
 
 String PacketToJson(Sensorpacket pkt, unsigned long time){
+    String output;
     const size_t capacity = JSON_OBJECT_SIZE(3) + JSON_OBJECT_SIZE(4);
     DynamicJsonDocument doc(capacity);
 
@@ -23,7 +24,8 @@ String PacketToJson(Sensorpacket pkt, unsigned long time){
     data["lng"] = pkt.sensorContent.lng;
     data["nonce"] = pkt.sensorContent.nonce;
 
-    serializeJson(doc, Serial);
+    serializeJson(doc, output);
+    return output;
 }
 
 void stateLedThread(void *Param){
@@ -75,7 +77,8 @@ void MessageStateMachine(){
             break;
         }
         case LORA_FAILED:
-
+            failedmessageState();
+            break;
         case SLEEP:{
             Serial.println("sleeping");
             startTimerDeepSleep();

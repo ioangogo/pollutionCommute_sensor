@@ -67,7 +67,7 @@ void doGPSTask(){
         }
     }
     #else
-    if(fix.valid.time && !timeGot){
+    if(!timeGot){
         gpslocTimeUnix = 1580121254;
         timeGot = true;
     }
