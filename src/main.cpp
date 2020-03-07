@@ -43,6 +43,7 @@ void handleConfigSaved();
 void handleReset();
 void ShowMSGs();
 void clrmsg();
+void sendMessagesOverWifi();
 
 void wifiCon(){
   wifiConnected=true;
@@ -132,9 +133,8 @@ void clrmsg(){
 }
 
 void sendMessagesOverWifi(){
-  if(wifiConnected){
-    sendMessages(net);
-  }
+  Serial.println("Sending Packets");
+  sendMessages(net);
   String s = "<html><head><meta http-equiv=\"Refresh\" content=\"0; url=/msgs\" /></head><body><p>Please follow <a href=\"/msgs\">this link</a>.</p></body></html>";
   server.send(200, "text/html", s);
 }
@@ -167,8 +167,10 @@ void ShowMSGs(){
     String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
     s += "<title>Commute Polution</title></head><body>";
     s += listMessages("/msgs");
-    if(wifiCon){
-      s+="<a href='/send'>Send Messages</a><br>"
+    if(wifiConnected){
+      unsigned int cachePrevention = esp_random();
+      String cacheStr= String(cachePrevention);
+      s+="<a href='/send?v="+cacheStr+"'>Send Messages</a><br>";
     }
     s += "<a href='/clear'>clear</a><br><a href='/'>Back to root</a>";
     s += "</body></html>\n";

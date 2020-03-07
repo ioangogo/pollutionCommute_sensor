@@ -34,25 +34,6 @@ void rmFile(File file){
     SPIFFS.remove(file.name());
 }
 
-
-void sendMessages(WiFiClient &net){
-    File root = SPIFFS.open("/msgs/");
-
-    File file = root.openNextFile();
-    while(file){
-        http.begin(net, "http://finalyear.loosleyweb.co.uk/ingest/sensorIn");
-        SensorFile record = loadFile(file);
-        Sensorpacket recordPkt;
-        memcpy(recordPkt.packetBytes, record.fileContent.packetBytes, PACKET_SIZE);
-        http.addHeader("Content-Type", "application/json");
-        http.POST(PacketToJson(recordPkt, record.fileContent.time));
-        file = root.openNextFile();
-        http.end();
-    }
-   
-    
-}
-
 void rmDirContents(String Dir){
 
     char filePathChar[FILENAME_MAX];
@@ -64,6 +45,35 @@ void rmDirContents(String Dir){
         file = root.openNextFile();
     }
     preferences.putInt("fileCount", 0);
+}
+
+//////////////////////////////////////////////////////////////////////
+// LS utility Functions                                             //
+// All share a simular structure so only the first one is commented//
+////////////////////////////////////////////////////////////////////
+String lsDir(String Dir){
+    // Conver the string we got to a char array for the SPIFF libary
+    char filePathChar[FILENAME_MAX];
+    Dir.toCharArray(filePathChar, FILENAME_MAX);
+    String ls = "";
+
+    // Open the folder and the first file in it
+    // Note: Spiffs doesnt have a physical folder structure
+    // and is simply part of the name 
+    // but the libary can pretend they exist by opening all the files
+    // that start with the directory
+    File root = SPIFFS.open(filePathChar);
+    File file = root.openNextFile();
+    
+    // Loop through the files
+    while(file){
+        // add their names to the string
+        ls.concat(file.name());
+        ls.concat("\n");
+        // open the next file
+        file = root.openNextFile();
+    }
+    return ls;
 }
 
 String listMessages(String Dir){
@@ -136,23 +146,59 @@ String lsRootHTML(){
     ls.concat("</ul>");
     return ls;
 }
+  ///////////////////////////
+ // End of list functions //
+///////////////////////////
 
-String lsDir(String Dir){
+int CountFilesDir(String Dir){
     char filePathChar[FILENAME_MAX];
     Dir.toCharArray(filePathChar, FILENAME_MAX);
-    String ls = "";
+    int count = 0;
     File root = SPIFFS.open(filePathChar);
  
     File file = root.openNextFile();
     
     while(file){
     
-        ls.concat(file.name());
-        ls.concat("\n");
-    
-        file = root.openNextFile();
+        count++;
     }
-    return ls;
+    return count;
+}
+
+
+/*
+Function: sendMessages(WiFiClient &net);
+Description: Takes a wificlient and sends all the messages stored in the 
+SPIFF messages directory to the sensor endpoint of the web service
+*/
+void sendMessages(WiFiClient &net){
+    File root = SPIFFS.open("/msgs");
+    int filesRM = 0;
+    int fileCount = CountFilesDir("/msgs");
+
+    File file = root.openNextFile();
+    while(file){
+        http.begin(net, "http://finalyear.loosleyweb.co.uk/ingest/sensorIn");
+        Serial.println("Sending data");
+        SensorFile record = loadFile(file);
+        Sensorpacket recordPkt;
+        memcpy(recordPkt.packetBytes, record.fileContent.packetBytes, PACKET_SIZE);
+        http.addHeader("Content-Type", "application/json");
+        int resp = http.POST(PacketToJson(recordPkt, record.fileContent.time));
+        if (resp == 200){
+            rmFile(file);
+            filesRM++;
+        }
+        file = root.openNextFile();
+        http.end();
+    }
+
+    //If we have successfully sent all the files we reset the counter(easier to think about)
+    if(filesRM == fileCount){
+        preferences.putInt("fileCount", 0);
+    }
+   
+    
 }
 
 bool writeMessage(Sensorpacket message){

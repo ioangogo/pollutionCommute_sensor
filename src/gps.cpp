@@ -68,7 +68,7 @@ void doGPSTask(){
     }
     #else
     if(!timeGot){
-        gpslocTimeUnix = 1580121254;
+        gpslocTimeUnix = 1583590184;
         timeGot = true;
     }
     if(!locGot){

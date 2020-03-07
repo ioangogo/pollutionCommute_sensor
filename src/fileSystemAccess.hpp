@@ -1,3 +1,5 @@
+#include <WiFiClient.h>
+
 void failedmessageState();
 void sendMessages(WiFiClient &net);
 String lsDirHTML(String Dir);
