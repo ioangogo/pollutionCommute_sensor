@@ -209,10 +209,12 @@ bool writeMessage(Sensorpacket message){
     }else{
         String filename="/msgs/";
         char filenameChar[FILENAME_MAX];
+        
         int filenum = preferences.getInt("fileCount", 0);
         filename.concat(filenum);
         filenum++;
         preferences.putInt("fileCount", filenum);
+        
         filename.concat(".msg");
         Serial.println(filename);
         filename.toCharArray(filenameChar, FILENAME_MAX);
