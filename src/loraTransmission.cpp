@@ -54,6 +54,7 @@ void onEvent (EventType ev) {
                 state = LORA_FAILED;
                 
             }
+            
             if (LMIC.getDataLen()) {
                 PRINT_DEBUG(1, F("Received %d bytes of payload"), LMIC.getDataLen());
                 auto data = LMIC.getData();
@@ -108,7 +109,7 @@ void loraInit(){
     //Following what the developer of the libary is doing to reduce power draw from radio
     //power instablity might be causing issues.
     //I might need to get a better USB cable as the one i am currently using struggles under load from some quick testing with a usb load
-    LMIC.setAntennaPowerAdjustment(-8);
+    LMIC.setAntennaPowerAdjustment(-14);
     sendjob.setCallbackRunnable(LoraSend);
     #endif
 }
