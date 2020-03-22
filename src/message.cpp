@@ -80,7 +80,6 @@ void MessageStateMachine(){
             failedmessageState();
             break;
         case SLEEP:{
-            Serial.println("sleeping");
             startTimerDeepSleep();
             break;
         }

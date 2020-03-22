@@ -1,3 +1,9 @@
+/*
+Due to this code being a derivitive work of LMICPP-Arduino's key handler this code is licenced under a 
+EPL v1.0 licence that can be found at link below:
+http://www.eclipse.org/legal/epl-v10.html
+*/
+
 #include <Arduino.h>
 #include "globals.hpp"
 #include <lmic.h>
@@ -5,7 +11,9 @@
 constexpr char const appEui[] = "70B3D57ED00259BF";
 
 
-// This code is from the lmicpp source for their key handler
+// This code is adapted from the lmicpp source for their key handler
+// If the keyhandler fitted my needs i would be using it anyway
+// Find original source under a Eclipse Public License v1.0 here: https://github.com/ngraziano/LMICPP-Arduino
 uint8_t HexCharToInt(char const char1) {
 
   return (char1 >= '0' && char1 <= '9')
@@ -23,8 +31,6 @@ void debugOutput(uint8_t *buf, int Len){
     for(int i = 0; i < Len; i++){
         Serial.printf("%02X ", buf[i]);
     }
-    Serial.println();
-
 }
 
 void getappEui(uint8_t *buf) {

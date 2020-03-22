@@ -216,7 +216,6 @@ bool writeMessage(Sensorpacket message){
         preferences.putInt("fileCount", filenum);
         
         filename.concat(".msg");
-        Serial.println(filename);
         filename.toCharArray(filenameChar, FILENAME_MAX);
         File messageFile = SPIFFS.open(filenameChar, FILE_WRITE);
         
@@ -224,8 +223,6 @@ bool writeMessage(Sensorpacket message){
 
         memcpy(file.fileContent.packetBytes, message.packetBytes, PACKET_SIZE);
         file.fileContent.time = gpslocTimeUnix;
-        Serial.println(gpslocTimeUnix);
-        Serial.println(file.fileContent.time);
 
         messageFile.write(file.fileBytes, FILE_SIZE);
         messageFile.close();

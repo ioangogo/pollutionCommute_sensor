@@ -46,22 +46,18 @@ void doGPSTask(){
     while(gps.available(gpsPort) && !locGot){
         fix = gps.read();
         if(fix.valid.time && !timeGot){
-            Serial.println("got Time");
             uint32_t UTCy2k = (NeoGPS::clock_t) fix.dateTime;
             unsigned long unixtimestamp = Y2KtoUnix(UTCy2k);
             //timeGot = true;
             gpslocTimeUnix = unixtimestamp;
         }
         if(fix.valid.location){
-            Serial.println("got location");
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
             int lat = lround(fix.latitude()*10000);
             int lng = lround(fix.longitude()*10000);
-            Serial.printf("GPS LAT: %f, GPS LNG: %f\n",fix.latitude(), fix.longitude());
 
             LoraPacket.sensorContent.lat = lat;
             LoraPacket.sensorContent.lng = lng;
-            Serial.printf("GPS LAT: %i, GPS LNG: %i\n",lat, lng);
             locGot = true;
             sleepDevice(gpsPort);
         }
@@ -72,7 +68,6 @@ void doGPSTask(){
         timeGot = true;
     }
     if(!locGot){
-        Serial.println("got location");
         // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
         int lat = lround(51.4981278*10000);
         int lng = lround(-2.5380904*10000);

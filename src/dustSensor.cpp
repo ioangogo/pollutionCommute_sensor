@@ -46,8 +46,6 @@ void doSDS(){
         while(samples >0){
             err = my_sds.read(&pm25, &pm10);
             if(err == 0){
-                Serial.printf("%f\r\n", pm25);
-                Serial.println("got pm2.5");
                 sample += pm25;
                 samples -=1;
                 delay(3*MS_TO_S_FACTOR);
@@ -62,7 +60,6 @@ void doSDS(){
     
     #else
     if(notcap){
-        Serial.println("got pm2.5");
         LoraPacket.sensorContent.pm25 = lround(10.5*10);
         notcap = false;
     }

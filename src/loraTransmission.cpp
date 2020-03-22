@@ -23,8 +23,8 @@ LmicEu868 LMIC {radio, OSS};
 
 OsJob sendjob{OSS};
 
-// Code from example code of the arduino-LMIC libary examples
-// Find original source here: https://github.com/mcci-catena/arduino-lmic/blob/master/examples/ttn-otaa/ttn-otaa.ino
+// Code from example code of the arduino-LMICPP libary examples
+// Find original source here: https://github.com/ngraziano/LMICPP-Arduino/tree/master/examples/esp32
 void printHex2(unsigned v) {
     v &= 0xff;
     if (v < 16)
@@ -48,7 +48,7 @@ void onEvent (EventType ev) {
             if (LMIC.getTxRxFlags().test(TxRxStatus::ACK)) {
                 PRINT_DEBUG(1, F("Received ack"));
                 state = SLEEP;
-            }else if(LMIC.getTxRxFlags().test(TxRxStatus::NACK)){
+            }else if(LMIC.getTxRxFlags().test(TxRxStatus::NOPORT) && LMIC.getTxRxFlags().test(TxRxStatus::NACK)){
                 // Although annother attempt could be made
                 // It was found that some gateways returned the wrong address and the sensor would get stuck retransmitting
                 state = LORA_FAILED;

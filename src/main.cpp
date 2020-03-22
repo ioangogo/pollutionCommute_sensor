@@ -52,6 +52,7 @@ void wifiCon(){
 void setup() {
   initFileSystem();
   pinMode(LED_BUILTIN, OUTPUT);
+  digitalWrite(LED_BUILTIN,1);
   Serial.begin(9600);
   Serial.println("Starting up...");
 
@@ -84,7 +85,7 @@ void setup() {
   }
   
   delay(2000);//Allow the user to reset befor doing anything
-
+  digitalWrite(LED_BUILTIN,0);
   if(setupMode){
     digitalWrite(LED_BUILTIN, 1);
     iotConf.addParameter(&devEUIConfig);
@@ -144,16 +145,14 @@ void handleReset(){
 }
 
 void handleRoot(){
-    Serial.println("got Request");
     if(iotConf.handleCaptivePortal()){
       return;
     }
     String s = "<!DOCTYPE html><html lang=\"en\"><head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1, user-scalable=no\"/>";
     s += "<title>Commute Polution</title></head><body>";
+    s += "<h1>Commute Pollution Sensor</h1>";
     s += "<ul>";
-    s += "<li> Appkey: ";
-    s += appKEYInput;
-    s += "</ul> <h2>Saved Messages</h2>";
+    s += "</ul><a href='msgs'><h2>Saved Messages</h2></a>";
     s += lsDirHTML("/msgs");
     s += "<h2>root</h2>";
     s += lsRootHTML();
