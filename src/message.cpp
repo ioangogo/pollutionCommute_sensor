@@ -31,7 +31,7 @@ String PacketToJson(Sensorpacket pkt, unsigned long time){
 void stateLedThread(void *Param){
     for(;;){
         digitalRead(LED_BUILTIN)?digitalWrite(LED_BUILTIN,0):digitalWrite(LED_BUILTIN,1);
-        delay((state+1)*1000);// Change blink speed depending on state
+        digitalRead(LED_BUILTIN)?delay(1000):delay((state+1)*1000);// Change blink speed depending on state
     }
 }
 
