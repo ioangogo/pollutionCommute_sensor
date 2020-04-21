@@ -1,9 +1,3 @@
-/*
-Due to this code being a derivitive work of LMICPP-Arduino's key handler this code is licenced under a 
-EPL v1.0 licence that can be found at link below:
-http://www.eclipse.org/legal/epl-v10.html
-*/
-
 #include <Arduino.h>
 #include "globals.hpp"
 #include <lmic.h>
@@ -26,6 +20,9 @@ uint8_t HexCharsToInt(char const char1, char const char2) {
 
   return (HexCharToInt(char1) * 0x10) + HexCharToInt(char2);
 }
+// End Of EPL 1.0 licenced code
+
+// Code from this point licenced under the repository licence
 
 void debugOutput(uint8_t *buf, int Len){
     for(int i = 0; i < Len; i++){
