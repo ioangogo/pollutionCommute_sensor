@@ -1,28 +1,9 @@
 #include <Arduino.h>
 #include "globals.hpp"
 #include <lmic.h>
+#include "hexUtil.h"
 
 constexpr char const appEui[] = "70B3D57ED00259BF";
-
-
-// This code is adapted from the lmicpp source for their key handler
-// If the keyhandler fitted my needs i would be using it anyway
-// Find original source under a Eclipse Public License v1.0 here: https://github.com/ngraziano/LMICPP-Arduino
-uint8_t HexCharToInt(char const char1) {
-
-  return (char1 >= '0' && char1 <= '9')
-             ? char1 - '0'
-             : (char1 >= 'A' && char1 <= 'F')
-                   ? char1 - 'A' + 0x0A
-                   : (char1 >= 'a' && char1 <= 'f') ? char1 - 'a' + 0x0A : 0;
-}
-uint8_t HexCharsToInt(char const char1, char const char2) {
-
-  return (HexCharToInt(char1) * 0x10) + HexCharToInt(char2);
-}
-// End Of EPL 1.0 licenced code
-
-// Code from this point licenced under the repository licence
 
 void debugOutput(uint8_t *buf, int Len){
     for(int i = 0; i < Len; i++){
