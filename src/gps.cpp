@@ -72,6 +72,7 @@ void doGPSTask(){
     }
     if(!locGot){
         // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
+        // in test mode we just pretend that we are recording some data at null island
         int lat = lround(0.0*10000);
         int lng = lround(0.0*10000);
             LoraPacket.sensorContent.lat = lat;
