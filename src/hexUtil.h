@@ -4,8 +4,9 @@
 #include <Arduino.h>
 
 // This code is adapted from the lmicpp source for their key handler
-// If the keyhandler fitted my needs i would be using it anyway
-// Find original source under a Eclipse Public License v1.0 here: https://github.com/ngraziano/LMICPP-Arduino
+// If the keyhandler fitted my needs i would be using it anyway, so i split it out into a seprate h file
+// this code is EPL 0.1 licenced
+// Find original source under a Eclipse Public License v1.0 here: https://github.com/ngraziano/LMICPP-Arduino/blob/master/src/keyhandler.h
 
 uint8_t HexCharToInt(char const char1) {
 

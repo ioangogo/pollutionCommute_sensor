@@ -43,6 +43,7 @@ void initGPS(){
 
 void doGPSTask(){
     #ifndef NO_SENSORS
+    bool hastime = false;
     while(gps.available(gpsPort) && !locGot){
         fix = gps.read();
         if(fix.valid.time && !timeGot){
@@ -50,6 +51,8 @@ void doGPSTask(){
             unsigned long unixtimestamp = Y2KtoUnix(UTCy2k);
             //timeGot = true;
             gpslocTimeUnix = unixtimestamp;
+            if (!hastime){printf("got time\n"); hastime=true;}
+            
         }
         if(fix.valid.location){
             // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
@@ -69,8 +72,8 @@ void doGPSTask(){
     }
     if(!locGot){
         // multipling by 1000 for transmit efficency and also to limit accuracy to 111m
-        int lat = lround(51.4981278*10000);
-        int lng = lround(-2.5380904*10000);
+        int lat = lround(0.0*10000);
+        int lng = lround(0.0*10000);
             LoraPacket.sensorContent.lat = lat;
             LoraPacket.sensorContent.lng = lng;
             locGot = true;
